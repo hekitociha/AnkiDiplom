@@ -9,7 +9,7 @@ namespace TaskManagerBackEnd.Data.Models
         [Key]
         public int Id { get; set; }
         public string Login { get; set; }
-        private string password = "";
+        private string password;
         public string Password
         {
             set { password = value; }
@@ -22,10 +22,10 @@ namespace TaskManagerBackEnd.Data.Models
             byte[] bytes = Encoding.Unicode.GetBytes(password);
             SHA256Managed hashstring = new SHA256Managed();
             byte[] hash = hashstring.ComputeHash(bytes);
-            string hashString = string.Empty;
+            string hashPassword = string.Empty;
             foreach (byte x in hash)
             {
-                hashString += String.Format("{0:x2}", x);
+                hashPassword += String.Format("{0:x2}", x);
             }
             return hashPassword;
         }
