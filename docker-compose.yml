@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+  ankibackend:
+    image: ${DOCKER_REGISTRY-}ankibackend
+    build:
+      context: .
+      dockerfile: AnkiBackEnd/Dockerfile
+#тут крч добавить фронт и прокси если захочешь
