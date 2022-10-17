@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TaskManagerBackEnd.Data;
+using AnkiDiplom.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

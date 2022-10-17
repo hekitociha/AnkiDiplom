@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace TaskManagerBackEnd.Data.Models
+namespace AnkiDiplom.Data.Models
 {
     public class Card
     {

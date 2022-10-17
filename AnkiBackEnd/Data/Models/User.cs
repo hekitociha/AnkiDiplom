@@ -2,7 +2,7 @@
 using System.Text;
 using XSystem.Security.Cryptography;
 
-namespace TaskManagerBackEnd.Data.Models
+namespace AnkiDiplom.Data.Models
 {
     public class User
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TaskManagerBackEnd.Data.Models;
+using AnkiDiplom.Data.Models;
 
-namespace TaskManagerBackEnd.Data
+namespace AnkiDiplom.Data
 {
     public class AppDBContent : DbContext
     {
@@ -10,7 +10,7 @@ namespace TaskManagerBackEnd.Data
         {
 
         }
-        public DbSet<Card> Things { get; set; }
+        public DbSet<Card> Cards { get; set; }
         public DbSet<User> Users { get; set; }
     }
 }

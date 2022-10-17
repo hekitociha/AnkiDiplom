@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TaskManagerBackEnd.Data;
-using TaskManagerBackEnd.Data.Models;
+using AnkiDiplom.Data;
+using AnkiDiplom.Data.Models;
 
-namespace TaskManagerBackEnd.Controllers
+namespace AnkiDiplom.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

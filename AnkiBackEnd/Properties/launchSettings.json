@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "TaskManagerBackEnd": {
+    "AnkiDiplom": {
       "commandName": "Project",
       "launchUrl": "swagger",
       "environmentVariables": {

@@ -5,42 +5,42 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TaskManagerBackEnd.Data;
-using TaskManagerBackEnd.Data.Models;
+using AnkiDiplom.Data;
+using AnkiDiplom.Data.Models;
 
-namespace TaskManagerBackEnd.Controllers
+namespace AnkiDiplom.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProblemsController : ControllerBase
+    public class CardsController : ControllerBase
     {
         private readonly AppDBContent _context;
 
-        public ProblemsController(AppDBContent context)
+        public CardsController(AppDBContent context)
         {
             _context = context;
         }
 
-        // GET: api/Problems
+        // GET: api/Cards
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Card>>> GetThings()
+        public async Task<ActionResult<IEnumerable<Card>>> GetCards()
         {
-          if (_context.Things == null)
+          if (_context.Cards == null)
           {
               return NotFound();
           }
-            return await _context.Things.ToListAsync();
+            return await _context.Cards.ToListAsync();
         }
 
-        // GET: api/Problems/5
+        // GET: api/Cards/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Card>> GetProblem(int id)
         {
-          if (_context.Things == null)
+          if (_context.Cards == null)
           {
               return NotFound();
           }
-            var problem = await _context.Things.FindAsync(id);
+            var problem = await _context.Cards.FindAsync(id);
 
             if (problem == null)
             {
@@ -52,15 +52,15 @@ namespace TaskManagerBackEnd.Controllers
 
         // PUT: api/Problems/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutProblem(int id, Card problem)
+        [HttpPut("update/{id}")]
+        public async Task<IActionResult> PutProblem(int id, Card card)
         {
-            if (id != problem.Id)
+            if (id != card.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(problem).State = EntityState.Modified;
+            _context.Entry(card).State = EntityState.Modified;
 
             try
             {
@@ -83,34 +83,34 @@ namespace TaskManagerBackEnd.Controllers
 
         // POST: api/Problems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Card>> PostProblem(Card problem)
+        [HttpPost("add")]
+        public async Task<ActionResult<Card>> PostProblem(Card card)
         {
-          if (_context.Things == null)
+          if (_context.Cards == null)
           {
               return Problem("Entity set 'AppDBContent.Things'  is null.");
           }
-            _context.Things.Add(problem);
+            _context.Cards.Add(card);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProblem", new { id = problem.Id }, problem);
+            return CreatedAtAction("GetProblem", new { id = card.Id }, card);
         }
 
         // DELETE: api/Problems/5
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteProblem(int id)
         {
-            if (_context.Things == null)
+            if (_context.Cards == null)
             {
                 return NotFound();
             }
-            var problem = await _context.Things.FindAsync(id);
-            if (problem == null)
+            var card = await _context.Cards.FindAsync(id);
+            if (card == null)
             {
                 return NotFound();
             }
 
-            _context.Things.Remove(problem);
+            _context.Cards.Remove(card);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -118,7 +118,7 @@ namespace TaskManagerBackEnd.Controllers
 
         private bool ProblemExists(int id)
         {
-            return (_context.Things?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Cards?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
