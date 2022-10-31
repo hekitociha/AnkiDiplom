@@ -2,7 +2,7 @@ import axios from "axios";
 import { API } from "../module/urlConsts";
 
 export const getProductsWithFilters = async (pageNum, searchString, filter) => {
-    const res = await axios.get(`${API.Product.Get}?PageNumber=${pageNum}&PageSize=6&searchstr=${searchString ?? ""}&quantity=${filter.quantity}&priceLow=${filter.priceLow}&priceHigh=${filter.priceHigh}&photoBill=${filter.photoBill}&minDate=${filter.minDate}&maxDate=${filter.maxDate}&userid=${filter.userId}`)
+    const res = await axios.get(`${API.Product.Get}?PageNumber=${pageNum}&PageSize=6&searchstr=${searchString ?? ""}`)
     return res.data
 }
 

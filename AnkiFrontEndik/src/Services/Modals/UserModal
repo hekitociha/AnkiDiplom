@@ -1,0 +1,35 @@
+import { useState } from 'react'
+import { FormControl} from '@mui/material';
+import './Style.css'
+import { createUser } from '../UserHelper';
+
+const NewUserModal = ({ setNewUserModal, getAndSetUserList }) => {
+
+    const [login, setLogin] = useState()
+    const [password, setPassword] = useState()
+
+    const newUser = () => {
+        if(login && password){
+            createUser(login, password)
+                .then(() => {
+                    getAndSetUserList()
+                    setNewUserModal(false)
+                })
+        }
+    }
+
+    return (
+        <div className='modal' onClick={()=>setNewUserModal(false)}>
+            <div className='modal-content' onClick={(e) => e.stopPropagation()}>
+                <div className='modal-body newUserModal'>
+                    <Text>Login</Text>
+                    <FormControl value={login} onChange={(e) => {setLogin(e.target.value)}}/>
+                    <Text>Password</Text>
+                    <FormControl value={password} onChange={(e) => {setPassword(e.target.value)}}/>
+                    <Button onClick={newUser} className="button_add">Добавить</Button>
+                </div>
+            </div>
+        </div>
+    )
+}
+export default NewUserModal
