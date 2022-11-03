@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { FormControl} from '@mui/material';
-import './Style.css'
+import '../../Components/Style.scss'
 import { createUser } from '../UserHelper';
 
 const NewUserModal = ({ setNewUserModal, getAndSetUserList }) => {
@@ -22,11 +22,11 @@ const NewUserModal = ({ setNewUserModal, getAndSetUserList }) => {
         <div className='modal' onClick={()=>setNewUserModal(false)}>
             <div className='modal-content' onClick={(e) => e.stopPropagation()}>
                 <div className='modal-body newUserModal'>
-                    <Text>Login</Text>
+                    <text>Login</text>
                     <FormControl value={login} onChange={(e) => {setLogin(e.target.value)}}/>
-                    <Text>Password</Text>
+                    <text>Password</text>
                     <FormControl value={password} onChange={(e) => {setPassword(e.target.value)}}/>
-                    <Button onClick={newUser} className="button_add">Добавить</Button>
+                    <button onClick={newUser} className="button_add">Зарегестрироваться</button>
                 </div>
             </div>
         </div>

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { FormControl, Input} from '@mui/material';
-import './Style.css'
-import {newUser} from UserModal
+import './Style.scss'
+import NewUserModal from '../Services/Modals/UserModal';
+
 
 export default class Header extends Component {
     render() {
@@ -19,7 +20,7 @@ export default class Header extends Component {
                 </div>
                 <div className="navbar right">
                     <button className="button signin" onClick>Войти</button>
-                    <button className="button" onClick={newUser}>Зарегистрироваться</button>
+                    <button className="button" onClick={NewUserModal}>Зарегистрироваться</button>
                 </div>
             </div>
             )

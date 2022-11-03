@@ -75,3 +75,22 @@
     width: 40%;
 
 }
+
+.modal-content {
+    background-color: transparent;
+    max-width: 38vw;
+    margin: auto;
+    border: none;
+}
+
+.modal-body{
+    &.newUserModal{
+        padding: 50px;
+        border-radius: 15px;
+        background-color: #5d5f61 !important;
+        text-align: initial;
+    }
+    .button_add{
+        margin-top: 10px;
+    }
+}

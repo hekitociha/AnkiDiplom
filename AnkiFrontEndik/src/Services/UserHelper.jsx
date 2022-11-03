@@ -1,5 +1,5 @@
 import axios from "axios"
-import { API } from "../module/urlConsts"
+import { API } from "../Services/UrlConsts"
 
 export const getUsers = async () => {
     const res = await axios.get(API.User.Get)
