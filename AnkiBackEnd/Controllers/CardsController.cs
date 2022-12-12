@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AnkiDiplom.Data;
 using AnkiDiplom.Data.Models;
+using AnkiBackEnd.Services;
+using AnkiBackEnd.Interfaces;
 
 namespace AnkiDiplom.Controllers
 {
@@ -15,26 +17,33 @@ namespace AnkiDiplom.Controllers
     public class CardsController : ControllerBase
     {
         private readonly AppDBContent _context;
+        private IUriService uriService;
 
-        public CardsController(AppDBContent context)
+        public CardsController(AppDBContent context, IUriService uriService)
         {
             _context = context;
+            this.uriService = uriService;
         }
 
         // GET: api/Cards
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Card>>> GetCards()
+        public async Task<ActionResult<IEnumerable<Card>>> GetCards([FromQuery] PaginationFilter filter, string topic)
         {
-          if (_context.Cards == null)
-          {
-              return NotFound();
-          }
-            return await _context.Cards.ToListAsync();
+            var cards = FiltrationService.filtration(_context, topic);
+            var route = Request.Path.Value;
+            var cardsCount = cards.ToList();
+            cards = cards.Include(t => t.user)
+                  .Skip((filter.PageNumber - 1) * filter.PageSize)
+                  .Take(filter.PageSize);
+            var cardsList = cards.ToList();
+            var totalRecords = cardsCount.Count();
+            var pagedResponse = PaginationHelper.CreatePagedReponse<Card>(cardsList, filter, totalRecords, uriService, route);
+            return Ok(pagedResponse);
         }
 
         // GET: api/Cards/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Card>> GetProblem(int id)
+        public async Task<ActionResult<Card>> GetCards(int id)
         {
           if (_context.Cards == null)
           {
@@ -53,7 +62,7 @@ namespace AnkiDiplom.Controllers
         // PUT: api/Problems/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> PutProblem(int id, Card card)
+        public async Task<IActionResult> PutCard(int id, Card card)
         {
             if (id != card.Id)
             {
@@ -68,7 +77,7 @@ namespace AnkiDiplom.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ProblemExists(id))
+                if (!CardExists(id))
                 {
                     return NotFound();
                 }
@@ -84,7 +93,7 @@ namespace AnkiDiplom.Controllers
         // POST: api/Problems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("add")]
-        public async Task<ActionResult<Card>> PostProblem(Card card)
+        public async Task<ActionResult<Card>> PostCard(Card card)
         {
           if (_context.Cards == null)
           {
@@ -98,7 +107,7 @@ namespace AnkiDiplom.Controllers
 
         // DELETE: api/Problems/5
         [HttpDelete("delete/{id}")]
-        public async Task<IActionResult> DeleteProblem(int id)
+        public async Task<IActionResult> DeleteCard(int id)
         {
             if (_context.Cards == null)
             {
@@ -116,7 +125,7 @@ namespace AnkiDiplom.Controllers
             return NoContent();
         }
 
-        private bool ProblemExists(int id)
+        private bool CardExists(int id)
         {
             return (_context.Cards?.Any(e => e.Id == id)).GetValueOrDefault();
         }

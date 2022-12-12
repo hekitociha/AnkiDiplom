@@ -9908,6 +9908,9 @@
       "Microsoft.VisualStudio.Azure.Containers.Tools.Targets >= 1.17.0",
       "Microsoft.VisualStudio.Web.CodeGeneration.Design >= 6.0.10",
       "Swashbuckle.AspNetCore >= 6.4.0",
+      "Swashbuckle.AspNetCore.Swagger >= 6.4.0",
+      "Swashbuckle.AspNetCore.SwaggerGen >= 6.4.0",
+      "Swashbuckle.AspNetCore.SwaggerUI >= 6.4.0",
       "XAct.Core.PCL >= 0.0.5014"
     ]
   },
@@ -9977,6 +9980,18 @@
             "version": "[6.0.10, )"
           },
           "Swashbuckle.AspNetCore": {
+            "target": "Package",
+            "version": "[6.4.0, )"
+          },
+          "Swashbuckle.AspNetCore.Swagger": {
+            "target": "Package",
+            "version": "[6.4.0, )"
+          },
+          "Swashbuckle.AspNetCore.SwaggerGen": {
+            "target": "Package",
+            "version": "[6.4.0, )"
+          },
+          "Swashbuckle.AspNetCore.SwaggerUI": {
             "target": "Package",
             "version": "[6.4.0, )"
           },

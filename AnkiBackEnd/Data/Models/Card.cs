@@ -11,6 +11,7 @@ namespace AnkiDiplom.Data.Models
         public string Description { get; set; }
         public string FrontSide { get; set; }
         public string BackSide { get; set; }
+        public string Topic { get; set; }
         [ForeignKey("user")]
         public int userid { get; set; }
         public virtual User user { get; set; }
