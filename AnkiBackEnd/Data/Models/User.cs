@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AnkiBackEnd.Services;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
-using XSystem.Security.Cryptography;
 
 namespace AnkiDiplom.Data.Models
 {
@@ -9,25 +9,13 @@ namespace AnkiDiplom.Data.Models
         [Key]
         public int Id { get; set; }
         public string Login { get; set; }
-        private string password;
+
+        private string _password { get; set; } 
         public string Password
         {
-            set { password = value; }
-            get { return password; }
+            get { return _password; }
+            set { PasswordHelper.GetPasswordHash(value); }
         }
         List<Card> cards { get; set; }
-
-        private string GetPasswordHash(string password)
-        {
-            byte[] bytes = Encoding.Unicode.GetBytes(password);
-            SHA256Managed hashstring = new SHA256Managed();
-            byte[] hash = hashstring.ComputeHash(bytes);
-            string hashPassword = string.Empty;
-            foreach (byte x in hash)
-            {
-                hashPassword += String.Format("{0:x2}", x);
-            }
-            return hashPassword;
-        }
     }
 }

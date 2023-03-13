@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "AnkiFrontEnd", "AnkiFrontEndik\AnkiFrontEnd.esproj", "{9D1D9942-A61C-4DED-96EE-4E63EA01E64D}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnkiBackEnd", "AnkiBackEnd\AnkiBackEnd.csproj", "{E9BD5DE7-1399-4EA3-8CF1-2BC632F98EF7}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{D47713C7-7F72-4184-A9B1-E5D889188CCA}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "ankifront", "ankifront\ankifront.esproj", "{3F2567F1-7C9F-4510-BBA2-C8271B01D696}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,12 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9D1D9942-A61C-4DED-96EE-4E63EA01E64D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9D1D9942-A61C-4DED-96EE-4E63EA01E64D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9D1D9942-A61C-4DED-96EE-4E63EA01E64D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{9D1D9942-A61C-4DED-96EE-4E63EA01E64D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9D1D9942-A61C-4DED-96EE-4E63EA01E64D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9D1D9942-A61C-4DED-96EE-4E63EA01E64D}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{E9BD5DE7-1399-4EA3-8CF1-2BC632F98EF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E9BD5DE7-1399-4EA3-8CF1-2BC632F98EF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9BD5DE7-1399-4EA3-8CF1-2BC632F98EF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -29,6 +23,12 @@ Global
 		{D47713C7-7F72-4184-A9B1-E5D889188CCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D47713C7-7F72-4184-A9B1-E5D889188CCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D47713C7-7F72-4184-A9B1-E5D889188CCA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F2567F1-7C9F-4510-BBA2-C8271B01D696}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F2567F1-7C9F-4510-BBA2-C8271B01D696}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F2567F1-7C9F-4510-BBA2-C8271B01D696}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{3F2567F1-7C9F-4510-BBA2-C8271B01D696}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F2567F1-7C9F-4510-BBA2-C8271B01D696}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F2567F1-7C9F-4510-BBA2-C8271B01D696}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

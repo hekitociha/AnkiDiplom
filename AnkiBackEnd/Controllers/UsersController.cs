@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AnkiDiplom.Data;
 using AnkiDiplom.Data.Models;
+using AnkiBackEnd.Services;
 
 namespace AnkiDiplom.Controllers
 {
@@ -21,26 +22,17 @@ namespace AnkiDiplom.Controllers
             _context = context;
         }
 
-        // GET: api/Users
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        // GET: api/Users/login
+        // Вход
+        [HttpGet("/login")]
+        public async Task<ActionResult<User>> GetUser(string login, string password)
         {
+            password = PasswordHelper.GetPasswordHash(password);
           if (_context.Users == null)
           {
               return NotFound();
           }
-            return await _context.Users.ToListAsync();
-        }
-
-        // GET: api/Users/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
-        {
-          if (_context.Users == null)
-          {
-              return NotFound();
-          }
-            var user = await _context.Users.FindAsync(id);
+            var user = _context.Users.Where(u => u.Login==login&&u.Password==password).First();
 
             if (user == null)
             {
@@ -83,13 +75,19 @@ namespace AnkiDiplom.Controllers
 
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
+        [HttpPost("/signup")]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-          if (_context.Users == null)
-          {
-              return Problem("Entity set 'AppDBContent.Users'  is null.");
-          }
+            if (_context.Users == null)
+            {
+                return Problem("Entity set 'AppDBContent.Users'  is null.");
+            }
+
+            if (_context.Users.Where(u=>u.Login == user.Login).ToList().Count !=0)
+            {
+                return Problem("Пользователь с таким логином уже существует. Придумайте другой логин");
+            }
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
