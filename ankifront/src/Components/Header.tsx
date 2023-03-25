@@ -1,8 +1,9 @@
-import { Input, FormControl } from '@mui/material';
+import { Input, FormControl, Button } from '@mui/material';
 import './Style.scss'
 import Avatar from '@mui/material/Avatar';
 import { deepPurple } from '@mui/material/colors';
 import { useState } from "react"
+import { Route } from 'react-router-dom';
 
 function Header() {
 
@@ -21,11 +22,11 @@ function Header() {
                         <Input id="my-input" aria-describedby="my-helper-text" />
                     </FormControl>
                 </div>
-                <div className="navbar">
+                <div className="navbar right">
                     {isLogin ? (
                         <>
                             <Avatar sx={{ bgcolor: deepPurple[500] }}>H</Avatar>
-                            <button onClick={() => setIsLogin(false)}>Выйти</button>
+                            <button className='button' onClick={() => setIsLogin(false)}>Выйти</button>
                         </>
                     ) : (
                         <>

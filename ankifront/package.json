@@ -20,6 +20,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.9.0",
     "react-scripts": "5.0.1",
+    "react-spring": "^9.7.1",
     "sass": "^1.58.3",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
@@ -52,5 +53,5 @@
     "eslint-config-react-app": "^7.0.1",
     "jest-editor-support": "^31.0.1"
   },
-  "proxy": "http://localhost:7052/"
+  "proxy": "http://localhost:5001/"
 }

@@ -10,12 +10,6 @@ namespace AnkiDiplom.Data.Models
         public int Id { get; set; }
         public string Login { get; set; }
 
-        private string _password { get; set; } 
-        public string Password
-        {
-            get { return _password; }
-            set { PasswordHelper.GetPasswordHash(value); }
-        }
         List<Card> cards { get; set; }
     }
 }

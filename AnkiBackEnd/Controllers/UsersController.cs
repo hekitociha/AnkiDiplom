@@ -17,29 +17,10 @@ namespace AnkiDiplom.Controllers
     {
         private readonly AppDBContent _context;
 
+
         public UsersController(AppDBContent context)
         {
             _context = context;
-        }
-
-        // GET: api/Users/login
-        // Вход
-        [HttpGet("/login")]
-        public async Task<ActionResult<User>> GetUser(string login, string password)
-        {
-            password = PasswordHelper.GetPasswordHash(password);
-          if (_context.Users == null)
-          {
-              return NotFound();
-          }
-            var user = _context.Users.Where(u => u.Login==login&&u.Password==password).First();
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return user;
         }
 
         // PUT: api/Users/5
@@ -71,27 +52,6 @@ namespace AnkiDiplom.Controllers
             }
 
             return NoContent();
-        }
-
-        // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("/signup")]
-        public async Task<ActionResult<User>> PostUser(User user)
-        {
-            if (_context.Users == null)
-            {
-                return Problem("Entity set 'AppDBContent.Users'  is null.");
-            }
-
-            if (_context.Users.Where(u=>u.Login == user.Login).ToList().Count !=0)
-            {
-                return Problem("Пользователь с таким логином уже существует. Придумайте другой логин");
-            }
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
         // DELETE: api/Users/5

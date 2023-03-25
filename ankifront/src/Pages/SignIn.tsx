@@ -1,33 +1,72 @@
-import axios from 'axios';
-import { useState } from 'react';
-import './Style.scss'
+import React, { useState } from "react";
+import axios, { AxiosRequestConfig } from "axios";
+import './StyleForSignInSignUp.scss'
 
-import { useNavigate } from "react-router-dom"
-
-function SignIn() {
-
-    const [login, setLogin] = useState("") 
-    const [password, setPassword] = useState("")
-    
-    const navigate = useNavigate();
-
-    const sendData = (e: any) => {
-        e.preventDefault()
-        return axios.get(`https://localhost:5001/login?login=${login}&password=${password}`)
-            .then(response => navigate("/"))
-    }
-
-    return (
-        <div className='bigContainer'>
-            <form onSubmit={sendData} className='container'>
-                <label htmlFor='login'>Логин</label>
-                <input id='login' value={login} onChange={(e) => setLogin(e.target.value)} className='login' placeholder='Введите логин' />
-                <label htmlFor='password'>Пароль</label>
-                <input id='password' value={password} onChange={(e) => setPassword(e.target.value)} className='password' placeholder='Введите пароль' />
-                <button type="submit">Войти</button>
-            </form>
-        </div>
-    )
+interface IFormData {
+    login: string;
+    password: string;
 }
 
-export default SignIn
+const SignIn: React.FC = () => {
+    const [formData, setFormData] = useState<IFormData>({
+        login: "",
+        password: "",
+    });
+
+    const handleInputChange = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ): void => {
+        setFormData((prevState: IFormData) => {
+            return {
+                ...prevState,
+                [event.target.name]: event.target.value,
+            };
+        });
+    };
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        try {
+            const response = await axios.post("https://localhost:5001/signin", formData);
+            console.log(response.data);
+            // Handle successful registration
+        } catch (error) {
+            console.error(error);
+            // Handle registration error
+        }
+    };
+
+    return (
+        <div className="signForm">
+            <div className="logo">
+            <img src="../Anki-icon.svg" width="70" alt="Логотип" />
+            <text className="logo Text">Anki - тренажер для запоминания</text>
+            </div>
+            <form onSubmit={handleSubmit} className="form">
+                <label htmlFor="username" className="Text">Логин:</label>
+                <input
+                    className="row"
+                    type="text"
+                    id="username"
+                    name="username"
+                    value={formData.login}
+                    onChange={handleInputChange}
+                    required
+                />
+                <label htmlFor="password" className="Text">Пароль:</label>
+                <input
+                    className="row"
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    required
+                />
+                <button className="buttonSign" type="submit">Войти</button>
+            </form>
+        </div>
+    );
+};
+
+export default SignIn;

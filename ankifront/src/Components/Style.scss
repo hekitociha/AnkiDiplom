@@ -9,10 +9,11 @@
     padding: 3%;
     padding-top: 1%;
     padding-bottom: 1%;
-    height: inherit;
+    align-items: center;
     position: relative;
 }
 .button {
+    border: 1px black solid;
     text-shadow: 1px 0 1px black, 0 1px 1px black, -1px 0 1px black, 0 -1px 1px black;
     background-color: white;
     color: blueviolet;
@@ -34,7 +35,6 @@
         margin: auto 5px;
         border-radius: 10px;
         font-family: 'Segoe Print';
-        cursor: pointer;
     }
 .nav-link {
     color: black;
@@ -64,12 +64,23 @@
 }
 
 .left {
-    padding-top: 0;
-    padding-bottom: 0;
-    padding-left: 0;
+    display: flex;
+    width: 33%;
+    height: 80%;
+    align-items: center;
+    justify-content: flex-start;
 }
 .center{
-    width: 40%;
+    display: flex;
+    width: 33%;
+    height: 80%;
+}
+
+.right{
+    display: flex;
+    width: 33%;
+    height: 80%;
+    justify-content: flex-end;
 }
 
 .modal-content {
