@@ -3,14 +3,14 @@ import axios, { AxiosRequestConfig } from "axios";
 import './StyleForSignInSignUp.scss'
 
 interface IFormData {
-    login: string;
-    password: string;
+    Login: string;
+    Password: string;
 }
 
 const SignIn: React.FC = () => {
     const [formData, setFormData] = useState<IFormData>({
-        login: "",
-        password: "",
+        Login: "",
+        Password: "",
     });
 
     const handleInputChange = (
@@ -48,8 +48,8 @@ const SignIn: React.FC = () => {
                     className="row"
                     type="text"
                     id="username"
-                    name="username"
-                    value={formData.login}
+                    name="Login"
+                    value={formData.Login}
                     onChange={handleInputChange}
                     required
                 />
@@ -58,8 +58,8 @@ const SignIn: React.FC = () => {
                     className="row"
                     type="password"
                     id="password"
-                    name="password"
-                    value={formData.password}
+                    name="Password"
+                    value={formData.Password}
                     onChange={handleInputChange}
                     required
                 />

@@ -25,7 +25,10 @@ function Header() {
                 <div className="navbar right">
                     {isLogin ? (
                         <>
-                            <Avatar sx={{ bgcolor: deepPurple[500] }}>H</Avatar>
+                            <Avatar sx={{ bgcolor: deepPurple[500] }}>
+                                <text>H</text>
+                                <a href="/user"></a>
+                            </Avatar>
                             <button className='button' onClick={() => setIsLogin(false)}>Выйти</button>
                         </>
                     ) : (

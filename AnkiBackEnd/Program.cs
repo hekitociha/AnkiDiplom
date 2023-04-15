@@ -1,8 +1,9 @@
-using Microsoft.EntityFrameworkCore;
-using AnkiDiplom.Data;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using AnkiBackEnd;
+using AnkiDiplom.Data;
+using AnkiDiplom.Data.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,28 +11,28 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
-string authConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDBContent>(options => options.UseSqlServer(connection));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddTransient<IUserClaimsPrincipalFactory<User>, UserClaimsPrincipalFactory<User>>();
 
 builder.Services.AddIdentityServer()
-    //.AddAspNetIdentity<AppUser>()
+    .AddAspNetIdentity<User>()
     .AddInMemoryApiResources(Configuration.ApiResources)
     .AddInMemoryIdentityResources(Configuration.IdentityResources)
     .AddInMemoryApiScopes(Configuration.ApiScopes)
     .AddInMemoryClients(Configuration.Clients)
     .AddDeveloperSigningCredential();
 
-builder.Services.AddIdentity<AppUser, IdentityRole>(config =>
+builder.Services.AddIdentity<User, IdentityRole>(config =>
 {
     config.Password.RequiredLength = 4;
     config.Password.RequireDigit = false;
     config.Password.RequireNonAlphanumeric = false;
     config.Password.RequireUppercase = false;
 })
-    .AddEntityFrameworkStores<AuthDbContext>()
+    .AddEntityFrameworkStores<AppDBContent>()
     .AddDefaultTokenProviders();
 
 builder.Services.ConfigureApplicationCookie(config =>

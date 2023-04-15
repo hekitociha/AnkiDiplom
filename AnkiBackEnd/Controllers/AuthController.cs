@@ -1,6 +1,6 @@
-﻿using AnkiBackEnd.Data.Models;
+﻿using AnkiDiplom.Data.Models;
+using AnkiBackEnd.Services;
 using AnkiDiplom.Data;
-using AnkiDiplom.Data.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Security.Claims;
+using AnkiBackEnd.Data.DTOs;
 
 namespace AnkiBackEnd.Controllers
 {
@@ -17,21 +18,32 @@ namespace AnkiBackEnd.Controllers
     public class AuthController : ControllerBase
     {
         private readonly AppDBContent _context;
+        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> _userManager;
+        private readonly IIdentityServerInteractionService _interactionService;
 
-        public AuthController(AppDBContent context)
+        public AuthController(AppDBContent context, SignInManager<User> signInManager, UserManager<User> userManager, IIdentityServerInteractionService interactionService)
         {
             _context = context;
+            _signInManager = signInManager;
+            _userManager = userManager;
+            _interactionService = interactionService;
         }
 
-        [HttpGet("/signin")]
-        public async Task<IActionResult> Login(string login, string userPassword)
+        [HttpPost("/signin")]
+        public async Task<IActionResult> Login(LoginDTO loginDTO)
         {
-            if (_context.Users.Where(u=> u.Login == login).Count()!=0 && userPassword == "password")
+            var user = await _context.Users.FindAsync(1);
+            if (user is null) 
+            { 
+                return BadRequest("Пользователь с таким логином не существует"); 
+            }
+            if (user.Password == loginDTO.Password)
             {
                 // Создаем утверждения для пользователя
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, login),
+                    new Claim(ClaimTypes.Name, loginDTO.Login),
                     new Claim(ClaimTypes.Role, "User")
                 };
                 var claimsIdentity = new ClaimsIdentity(

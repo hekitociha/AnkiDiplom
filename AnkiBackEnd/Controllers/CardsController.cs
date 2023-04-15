@@ -17,27 +17,27 @@ namespace AnkiDiplom.Controllers
     public class CardsController : ControllerBase
     {
         private readonly AppDBContent _context;
-        private IUriService uriService;
+        private IUriService _uriService;
 
         public CardsController(AppDBContent context, IUriService uriService)
         {
             _context = context;
-            this.uriService = uriService;
+            _uriService = uriService;
         }
 
         // GET: api/Cards
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Card>>> GetCards([FromQuery] PaginationFilter filter, string topic)
+        public async Task<ActionResult<IEnumerable<Card>>> GetCards([FromQuery] PaginationFilter filter, string topic, User user)
         {
             var cards = FiltrationService.filtration(_context, topic);
             var route = Request.Path.Value;
             var cardsCount = cards.ToList();
-            cards = cards.Include(t => t.user)
+            cards = cards.Include(c => c.user)
                   .Skip((filter.PageNumber - 1) * filter.PageSize)
                   .Take(filter.PageSize);
             var cardsList = cards.ToList();
             var totalRecords = cardsCount.Count();
-            var pagedResponse = PaginationHelper.CreatePagedReponse<Card>(cardsList, filter, totalRecords, uriService, route);
+            var pagedResponse = PaginationHelper.CreatePagedReponse<Card>(cardsList, filter, totalRecords, _uriService, route);
             return Ok(pagedResponse);
         }
 
@@ -49,14 +49,14 @@ namespace AnkiDiplom.Controllers
           {
               return NotFound();
           }
-            var problem = await _context.Cards.FindAsync(id);
+            var card = await _context.Cards.FindAsync(id);
 
-            if (problem == null)
+            if (card == null)
             {
                 return NotFound();
             }
 
-            return problem;
+            return card;
         }
 
         // PUT: api/Problems/5
