@@ -3,16 +3,16 @@ import axios from "axios";
 import './StyleForSignInSignUp.scss'
 
 interface IFormData {
-    Login: string;
+    Email: string;
     Password: string;
-    RepeatPassword: string;
+    ConfirmPassword: string;
 }
 
 const SignUp: React.FC = () => {
     const [formData, setFormData] = useState<IFormData>({
-        Login: "",
+        Email: "",
         Password: "",
-        RepeatPassword: "",
+        ConfirmPassword: "",
     });
 
     const handleInputChange = (
@@ -49,9 +49,9 @@ const SignUp: React.FC = () => {
                 <input
                     className="row"
                     type="text"
-                    id="login"
-                    name="Login"
-                    value={formData.Login}
+                    id="email"
+                    name="Email"
+                    value={formData.Email}
                     onChange={handleInputChange}
                     required
                 />
@@ -65,13 +65,13 @@ const SignUp: React.FC = () => {
                     onChange={handleInputChange}
                     required
                 />
-                <label htmlFor="repeatPassword" className="Text">Повторите пароль:</label>
+                <label htmlFor="password" className="Text">Повторите пароль:</label>
                 <input
                     className="row"
-                    type="repeatPassword"
-                    id="repeatPassword"
-                    name="RepeatPassword"
-                    value={formData.RepeatPassword}
+                    type="password"
+                    id="confirmPassword"
+                    name="ConfirmPassword"
+                    value={formData.ConfirmPassword}
                     onChange={handleInputChange}
                     required
                 />

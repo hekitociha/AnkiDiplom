@@ -1,9 +1,12 @@
 using AnkiBackEnd;
+using AnkiBackEnd.Services;
 using AnkiDiplom.Data;
 using AnkiDiplom.Data.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,32 +18,39 @@ builder.Services.AddDbContext<AppDBContent>(options => options.UseSqlServer(conn
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddTransient<IUserClaimsPrincipalFactory<User>, UserClaimsPrincipalFactory<User>>();
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ClockSkew = TimeSpan.Zero,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "apiWithAuthBackend",
+            ValidAudience = "apiWithAuthBackend",
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes("!AnkiDiplomSuperMegaPuperSecretToken!")
+            ),
+        };
+    });
 
-builder.Services.AddIdentityServer()
-    .AddAspNetIdentity<User>()
-    .AddInMemoryApiResources(Configuration.ApiResources)
-    .AddInMemoryIdentityResources(Configuration.IdentityResources)
-    .AddInMemoryApiScopes(Configuration.ApiScopes)
-    .AddInMemoryClients(Configuration.Clients)
-    .AddDeveloperSigningCredential();
+builder.Services.AddScoped<TokenService, TokenService>();
 
-builder.Services.AddIdentity<User, IdentityRole>(config =>
-{
-    config.Password.RequiredLength = 4;
-    config.Password.RequireDigit = false;
-    config.Password.RequireNonAlphanumeric = false;
-    config.Password.RequireUppercase = false;
-})
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+    options.Password = new PasswordOptions
+    {
+        RequireDigit = true,
+        RequiredLength = 6,
+        RequireLowercase = true,
+        RequireUppercase = true,
+        RequireNonAlphanumeric = true,
+    })
     .AddEntityFrameworkStores<AppDBContent>()
-    .AddDefaultTokenProviders();
-
-builder.Services.ConfigureApplicationCookie(config =>
-{
-    config.Cookie.Name = "IdentityServer.Cookie";
-    config.LoginPath = "/Auth/Login";
-    config.LogoutPath = "/Auth/Logout";
-});
+    .AddDefaultTokenProviders()
+    .AddErrorDescriber<CustomIdentityErrorDescriber>();
 
 builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
     builder =>

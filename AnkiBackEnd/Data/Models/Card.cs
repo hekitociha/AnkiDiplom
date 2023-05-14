@@ -13,7 +13,7 @@ namespace AnkiDiplom.Data.Models
         public string BackSide { get; set; }
         public string Topic { get; set; }
         [ForeignKey("user")]
-        public int userId { get; set; }
+        public string userId { get; set; }
         public virtual User user { get; set; }
     }
 }
