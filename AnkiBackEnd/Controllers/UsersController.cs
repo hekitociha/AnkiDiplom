@@ -7,6 +7,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace AnkiDiplom.Controllers
 {
@@ -17,74 +22,96 @@ namespace AnkiDiplom.Controllers
         private readonly AppDBContent _context;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private TokenService _tokenService;
 
-        public UsersController(AppDBContent context, UserManager<User> userManager, SignInManager<User> signInManager, TokenService tokenService)
+        public UsersController(AppDBContent context, UserManager<User> userManager, SignInManager<User> signInManager, TokenService tokenService, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        [HttpGet("/getint"), Authorize]
+        public async Task<int> GetInt()
+        {
+            return 1;
         }
 
         [HttpPost("/signup")]
         [AllowAnonymous]
         public async Task<IActionResult> Register(RegisterModel registerModel)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var result = await _userManager.CreateAsync(
-                new User { UserName = registerModel.Email, Email = registerModel.Email },
-                registerModel.Password
-            );
+            var user = new User { UserName = registerModel.Email, Email = registerModel.Email};
+            var result = await _userManager.CreateAsync(user, registerModel.Password);
             if (result.Succeeded)
             {
-                registerModel.Password = "";
-                return CreatedAtAction(nameof(Register), new { email = registerModel.Email }, registerModel);
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return Ok();
             }
-            foreach (var error in result.Errors)
+            else
             {
-                ModelState.AddModelError(error.Code, error.Description);
+                return BadRequest(result.Errors);
             }
-            return BadRequest(ModelState);
         }
         [HttpPost("/signin")]
         public async Task<ActionResult<LoginDTO>> Login(LoginModel loginModel)
         {
-            if (!ModelState.IsValid)
+            var result = await _signInManager.PasswordSignInAsync(loginModel.Email, loginModel.Password, isPersistent: false, lockoutOnFailure: false);
+            if (result.Succeeded)
             {
-                return BadRequest(ModelState);
-            }
+                var user = await _userManager.FindByEmailAsync(loginModel.Email);
 
-            var managedUser = await _userManager.FindByEmailAsync(loginModel.Email);
-            if (managedUser == null)
-            {
-                return BadRequest("Bad credentials");
+                var token = _tokenService.CreateToken(user);
+
+                return new LoginDTO 
+                { 
+                    IsAuthorized = true,
+                    Error = "",
+                    Token = token
+                };
+
             }
-            var isPasswordValid = await _userManager.CheckPasswordAsync(managedUser, loginModel.Password);
-            if (!isPasswordValid)
+            else
             {
-                return BadRequest("Bad credentials");
+                return new LoginDTO
+                {
+                    IsAuthorized = false,
+                    Error = "Неверные логин/пароль",
+                    Token = ""
+                };
             }
-            var userInDb = _context.Users.FirstOrDefault(u => u.Email == loginModel.Email);
-            if (userInDb is null)
-                return Unauthorized();
-            var accessToken = _tokenService.CreateToken(userInDb);
-            await _context.SaveChangesAsync();
-            return Ok(new LoginDTO
-            {
-                Email = userInDb.Email,
-                Token = accessToken,
-            });
         }
 
+        [HttpGet("/signout")]
+        public async void LogOut()
+        {
+            await _signInManager.SignOutAsync();
+        }
 
+        [HttpGet("/profile")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<ActionResult<User>> Profile()
+        {
+            try
+            {
+                var currentUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var currentUser = await _context.Users.Include(u => u.Cards)
+                    .FirstOrDefaultAsync(o => o.Id == currentUserId);
+
+                return currentUser;
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}"), Authorize]
+        [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
             if (id.ToString() != user.Id)
@@ -114,7 +141,7 @@ namespace AnkiDiplom.Controllers
         }
 
         // DELETE: api/Users/5
-        [HttpDelete("{id}"), Authorize]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             if (_context.Users == null)

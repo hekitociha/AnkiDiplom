@@ -2,7 +2,9 @@
 {
     public class LoginDTO
     {
-        public string Email { get; set; }
+        public bool IsAuthorized { get; set; }
         public string Token { get; set; }
+        public string Error { get; set; }
     }
 }
+    

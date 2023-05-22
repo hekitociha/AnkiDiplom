@@ -3,7 +3,8 @@ import './Style.scss'
 import Avatar from '@mui/material/Avatar';
 import { deepPurple } from '@mui/material/colors';
 import { useState } from "react"
-import { Route } from 'react-router-dom';
+import { NavLink, Route } from 'react-router-dom';
+import { request } from '../Services/request';
 
 function Header() {
 
@@ -25,11 +26,12 @@ function Header() {
                 <div className="navbar right">
                     {isLogin ? (
                         <>
-                            <Avatar sx={{ bgcolor: deepPurple[500] }}>
-                                <text>H</text>
-                                <a href="/user"></a>
-                            </Avatar>
-                            <button className='button' onClick={() => setIsLogin(false)}>Выйти</button>
+                            <a className='avatar' href = '/profile' >
+                                <Avatar sx={{ bgcolor: deepPurple[500] }}>
+                                    <text>H</text>                                    
+                                </Avatar>
+                            </a>
+                            <button className='button' onClick={() => request.get("/signout")}>Выйти</button>
                         </>
                     ) : (
                         <>

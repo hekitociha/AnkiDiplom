@@ -12,6 +12,6 @@ namespace AnkiDiplom.Data
 
         }
         public DbSet<Card> Cards { get; set; }
-        public DbSet<User> Users { get; set; }
+        public override DbSet<User> Users { get; set; }
     }
 }

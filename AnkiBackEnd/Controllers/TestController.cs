@@ -14,18 +14,20 @@ namespace AnkiBackEnd.Controllers
     {
         public TestResultDTO TestResult { get; set; }
 
-        public TestController(AppDBContent context)
+        public TestController()
         {
             TestResult = new();
         }
 
-        [Route("/starttest"), Authorize]
+        [HttpGet]
+        [Route("/starttest")]
         public async Task<ActionResult<List<Card>>> StartTest(User user)
         {
-            TestResult.TotalScore = user.Сards.Count;
-            return user.Сards.ToList().Random(user.Сards.Count);
+            TestResult.TotalScore = user.Cards.Count;
+            return user.Cards.ToList().Random(user.Cards.Count);
         }
 
+        [HttpGet]
         [Route("/checkanswer")]
         public async Task<ActionResult<bool>> CheckAnswer(Card card, string userAnswer)
         {
@@ -41,6 +43,7 @@ namespace AnkiBackEnd.Controllers
             return true;
         }
 
+        [HttpGet]
         [Route("/getscores"), Authorize] 
         public TestResultDTO GetScores()
         {

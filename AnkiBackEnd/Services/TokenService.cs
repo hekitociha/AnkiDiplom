@@ -12,7 +12,7 @@ namespace AnkiBackEnd.Services
         private const int ExpirationMinutes = 30;
         public string CreateToken(IdentityUser user)
         {
-            var expiration = DateTime.UtcNow.AddMinutes(ExpirationMinutes);
+            var expiration = DateTime.UtcNow.AddDays(7);
             var token = CreateJwtToken(
                 CreateClaims(user),
                 CreateSigningCredentials(),
@@ -25,8 +25,8 @@ namespace AnkiBackEnd.Services
         private JwtSecurityToken CreateJwtToken(List<Claim> claims, SigningCredentials credentials,
             DateTime expiration) =>
             new(
-                "apiWithAuthBackend",
-                "apiWithAuthBackend",
+                "AnkiWebApi",
+                "AnkiClient",
                 claims,
                 expires: expiration,
                 signingCredentials: credentials
@@ -38,7 +38,7 @@ namespace AnkiBackEnd.Services
             {
                 var claims = new List<Claim>
                 {
-                    new Claim(JwtRegisteredClaimNames.Sub, "TokenForTheApiWithAuth"),
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)),
                     new Claim(ClaimTypes.NameIdentifier, user.Id),

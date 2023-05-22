@@ -1,7 +1,8 @@
 import axios from "axios";
-import { AnkiCard, User } from "../Pages/ProfilePage";
+import { User } from "../entities/User";
+import { AnkiCard } from "../entities/AnkiCard";
 
-export const GetTestCard = (user: User) => {
-    const res = axios.post<Array<AnkiCard>>("https://localhost:5001/starttest", user)
-    return res
+export const GetTestCard = async(user: User) => {
+    const res = await  axios.post<Array<AnkiCard>>("https://localhost:5001/starttest", user)
+    return res.data
 }

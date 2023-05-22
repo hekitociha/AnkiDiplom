@@ -4,6 +4,8 @@ import ReactCardFlip from 'react-card-flip';
 import { useSpring, animated } from 'react-spring';
 import Header from "../Components/Header";
 import './StyleForHomePage.scss'
+import { request } from "../Services/request";
+import Cookies from "js-cookie";
 
 export const HomePage = () => {
 
@@ -31,6 +33,19 @@ export const HomePage = () => {
     delay: 1500,
   });
 
+  const handleSubmit = async () => {
+    try {
+        const response = await request.get("getint", {
+          headers: {Authorization: `Bearer ${Cookies.get("token")}`}
+
+        });
+        // Handle successful registration
+    } catch (error) {
+        console.error(error);
+        // Handle registration error
+    }
+};
+
   return (
     <>
       <Header />
@@ -41,7 +56,7 @@ export const HomePage = () => {
             Здесь вы можете создавать и изучать колоды карточек для запоминания информации
           </animated.p>
           <animated.div style={buttonAnimation} >
-            <button className="button">Создать колоду</button>
+            <button className="button" onClick={handleSubmit}>Создать колоду</button>
             <button className="button">Выбрать колоду</button>
           </animated.div>
         </div>

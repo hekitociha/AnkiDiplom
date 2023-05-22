@@ -27,7 +27,7 @@ namespace AnkiDiplom.Controllers
         }
 
         // GET: api/Cards
-        [HttpGet, Authorize] 
+        [HttpGet] 
         public async Task<ActionResult<IEnumerable<Card>>> GetCards([FromQuery] PaginationFilter filter, string topic, User user)
         {
             var cards = FiltrationService.filtration(_context, topic);
@@ -43,7 +43,7 @@ namespace AnkiDiplom.Controllers
         }
 
         // GET: api/Cards/5
-        [HttpGet("{id}"), Authorize] 
+        [HttpGet("{id}")] 
         public async Task<ActionResult<Card>> GetCards(int id)
         {
           if (_context.Cards == null)
@@ -62,7 +62,7 @@ namespace AnkiDiplom.Controllers
 
         // PUT: api/Problems/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("/update/{id}"), Authorize] 
+        [HttpPut("/update/{id}")] 
         public async Task<IActionResult> PutCard(int id, Card card)
         {
             if (id != card.Id)
@@ -93,7 +93,7 @@ namespace AnkiDiplom.Controllers
 
         // POST: api/Problems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("/add"), Authorize] 
+        [HttpPost("/add")] 
         public async Task<ActionResult<Card>> PostCard(Card card)
         {
           if (_context.Cards == null)
@@ -107,7 +107,7 @@ namespace AnkiDiplom.Controllers
         }
 
         // DELETE: api/Problems/5
-        [HttpDelete("/delete/{id}"), Authorize] 
+        [HttpDelete("/delete/{id}")] 
         public async Task<IActionResult> DeleteCard(int id)
         {
             if (_context.Cards == null)

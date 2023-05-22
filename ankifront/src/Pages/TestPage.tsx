@@ -1,16 +1,21 @@
-import { Card, CardContent, Typography, Button, CardActions, Box, Badge } from "@mui/material";
-import { useState } from "react"
-import ReactCardFlip from 'react-card-flip';
-import { useSpring, animated } from 'react-spring';
-import Header from "../Components/Header";
-import axios from "axios";
-import { AnkiCard, User } from "./ProfilePage";
-import { GetTestCard } from "../Services/TestCardRequest";
+import { Card, CardContent, Typography, Badge, CardActions } from "@mui/material"
+import { useState, useEffect } from "react"
+import Header from "../Components/Header"
+import { GetTestCard } from "../Services/TestCardRequest"
+import { request } from "../Services/request"
+import { AnkiCard } from "../entities/AnkiCard"
 
+export const TestPage = () => {
 
-export const TestPage = async (user: User) => {
+  const [cards, setCards] = useState<AnkiCard[]>([])
 
-  let { data: cards } = await GetTestCard(user);
+  useEffect(()=>{
+    request.get("/profile").then(({data})=>{
+      GetTestCard(data).then((dataCards)=>{
+        setCards(dataCards)
+      })
+    })
+  }, [] )
 
   return (
     <div>

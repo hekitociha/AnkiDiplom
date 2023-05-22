@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import './StyleForSignInSignUp.scss'
+import { request } from "../Services/request";
 
 interface IFormData {
     Email: string;
@@ -29,7 +30,7 @@ const SignUp: React.FC = () => {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
-            const response = await axios.post("https://localhost:5001/signup", formData);
+            const response = await request.post("signup", formData);
             console.log(response.data);
             // Handle successful registration
         } catch (error) {

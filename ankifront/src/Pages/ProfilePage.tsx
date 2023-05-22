@@ -1,40 +1,30 @@
-
 import ReactCardFlip from 'react-card-flip';
 import { Card, CardContent, Typography, Button, CardActions, Box, Badge } from "@mui/material";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { User } from '../entities/User';
+import { AnkiCard } from '../entities/AnkiCard';
+import { request } from "../Services/request";
+import { render } from '@testing-library/react';
 
-export interface AnkiCard {
-  Id: number;
-  FrontSide: string;
-  BackSide: string;
-  Topic: string;
-}
+const ProfilePage = () => {
 
-
-export interface User {
-  Id: number;
-  Login: string;
-  AvatarSrc: string;
-  Cards: AnkiCard[];
-}
-
-interface ProfilePageProps {
-  user: User;
-}
-
-
-
-const ProfilePage: React.FC<ProfilePageProps> = ({ user }) => {
   const [newCardFrontSide, setNewCardFrontSide] = useState('');
   const [newCardBackSide, setNewCardBackSide] = useState('');
   const [newCardTopic, setNewCardTopic] = useState('');
 
-
   const [isFlipped, setIsFlipped] = useState<boolean>(false)
 
-const flipCard = () => {
-  setIsFlipped(prevState => !prevState)
-}
+  const flipCard = () => {
+    setIsFlipped(prevState => !prevState)
+  }
+
+  const [user, setUser] = useState<User>()
+
+  useEffect(() => {
+    request.get("/profile").then(data => {
+      setUser(data.data)
+    })
+  }, [])
 
   const handleNewCardFrontSideChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNewCardFrontSide(event.target.value);
@@ -52,30 +42,34 @@ const flipCard = () => {
     event.preventDefault();
 
     const newCard: AnkiCard = {
-      Id: user.Cards.length + 1,
+      Id: user!.cards.length + 1,
       FrontSide: newCardFrontSide,
       BackSide: newCardBackSide,
-      Topic: newCardTopic
+      Topic: newCardTopic,
+      userId: user!.id,
+      user: user
     };
 
-    user.Cards.push(newCard);
+    user!.cards.push(newCard);
+    request.post("/add", newCard);
 
     setNewCardFrontSide('');
     setNewCardBackSide('');
     setNewCardTopic('');
   };
-
+  if (!user) return <div/>
+  else
   return (
     <div>
       <div>
-        <img src={user.AvatarSrc} alt="Avatar" />
-        <h2>{user.Login}</h2>
+        <img src={user.avatarSrc} alt="Avatar" />
+        <h2>{user.email}</h2>
       </div>
 
       <div>
         <h3>My Posts</h3>
         <ul>
-          {user.Cards.map((card) => (
+          {user.cards.map((card) => (
             <li key={card.Id}>
               <ReactCardFlip isFlipped={isFlipped} flipDirection="horizontal">
                 <Card sx={{ minWidth: 275 }} onClick={flipCard}>
@@ -103,7 +97,7 @@ const flipCard = () => {
                       Ответ:
                     </Typography>
                     <Typography variant="h5" component="div" width={"395px"}>
-                    <text>{card.BackSide}</text>
+                      <text>{card.BackSide}</text>
                     </Typography>
                     <Typography sx={{ mb: 1.5 }} color="text.secondary">
 
@@ -138,7 +132,7 @@ const flipCard = () => {
         </form>
       </div>
     </div>
-  );
+  )
 };
 
 export default ProfilePage;

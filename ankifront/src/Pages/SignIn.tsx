@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios, { AxiosRequestConfig } from "axios";
 import './StyleForSignInSignUp.scss'
+import { request } from "../Services/request";
+import { Link, Navigate } from "react-router-dom";
 
 interface IFormData {
     Email: string;
@@ -24,11 +26,34 @@ const SignIn: React.FC = () => {
         });
     };
 
+    const [authorized, setAuthorized] = useState<boolean>(false)
+
+    const [visible, setVisible] = useState<boolean>(false)
+    const onClose = () => setVisible(false)
+
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
-            const response = await axios.post("https://localhost:5001/signin", formData);
+            const response = await request.post("signin", formData);
             console.log(response.data);
+            if (response.data.isAuthorized === true) {
+                document.cookie = `token=${response.data.token}`
+                setAuthorized(response.data.isAuthorized)               
+            }
+            else if (!visible) return null 
+            else return(<div className='modal' onClick={onClose}>
+            <div className='modal-dialog' onClick={e => e.stopPropagation()}>
+              <div className='modal-header'>
+                <span className='modal-close' onClick={onClose}>
+                  &times;
+                </span>
+              </div>
+              <div className='modal-body'>
+                <div className='modal-content'>{response.data.error}</div>
+              </div>
+            </div>
+          </div>)
+
             // Handle successful registration
         } catch (error) {
             console.error(error);
@@ -36,11 +61,13 @@ const SignIn: React.FC = () => {
         }
     };
 
+    if (authorized) return <Navigate to="/profile"/>
+    else
     return (
         <div className="signForm">
             <div className="logo">
-            <img src="../Anki-icon.svg" width="70" alt="Логотип" />
-            <text className="logo Text">Anki - тренажер для запоминания</text>
+                <img src="../Anki-icon.svg" width="70" alt="Логотип" />
+                <text className="logo Text">Anki - тренажер для запоминания</text>
             </div>
             <form onSubmit={handleSubmit} className="form">
                 <label htmlFor="username" className="Text">Логин:</label>
