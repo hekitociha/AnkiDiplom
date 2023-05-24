@@ -1,7 +1,6 @@
-using AnkiBackEnd;
+using AnkiBackEnd.Data.Models;
 using AnkiBackEnd.Services;
 using AnkiDiplom.Data;
-using AnkiDiplom.Data.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

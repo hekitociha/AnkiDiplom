@@ -1,14 +1,13 @@
 ﻿using AnkiBackEnd.Interfaces;
 using AnkiBackEnd.Wrappers;
-using AnkiDiplom.Data.Models;
 
 namespace AnkiBackEnd.Services
 {
-    public class PaginationHelper
+    public class PaginationHelper<T>
     {
-        public static PagedResponse<IEnumerable<Card>> CreatePagedReponse<thing>(List<Card> pagedData, PaginationFilter filter, int totalRecords, IUriService uriService, string route)
+        public static PagedResponse<IEnumerable<T>> CreatePagedReponse(List<T> pagedData, PaginationFilter filter, int totalRecords, IUriService uriService, string route)
         {
-            var respose = new PagedResponse<IEnumerable<Card>>(pagedData, filter.PageNumber, filter.PageSize);
+            var respose = new PagedResponse<IEnumerable<T>>(pagedData, filter.PageNumber, filter.PageSize);
             var totalPages = ((double)totalRecords / (double)filter.PageSize);
             int roundedTotalPages = Convert.ToInt32(Math.Ceiling(totalPages));
             respose.NextPage =

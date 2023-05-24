@@ -1,17 +1,13 @@
 ﻿using AnkiBackEnd.Data.DTOs;
 using AnkiBackEnd.Data.LoginModels;
+using AnkiBackEnd.Data.Models;
 using AnkiBackEnd.Services;
 using AnkiDiplom.Data;
-using AnkiDiplom.Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace AnkiDiplom.Controllers
 {
@@ -86,6 +82,7 @@ namespace AnkiDiplom.Controllers
         }
 
         [HttpGet("/signout")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async void LogOut()
         {
             await _signInManager.SignOutAsync();
@@ -98,8 +95,25 @@ namespace AnkiDiplom.Controllers
             try
             {
                 var currentUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var currentUser = await _context.Users.Include(u => u.Cards)
+                var currentUser = await _context.Users.Include(u => u.Decks)
+                    .Include(u=>u.TestResults)
                     .FirstOrDefaultAsync(o => o.Id == currentUserId);
+
+                return currentUser;
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("/profile/{id}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<ActionResult<User>> Profile(string id)
+        {
+            try
+            {
+                var currentUser = await _context.Users.Include(u => u.Decks.Where(d=>!d.IsPrivate))
+                    .FirstOrDefaultAsync(o => o.Id == id);
 
                 return currentUser;
             }
@@ -112,6 +126,7 @@ namespace AnkiDiplom.Controllers
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
             if (id.ToString() != user.Id)
@@ -142,6 +157,7 @@ namespace AnkiDiplom.Controllers
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             if (_context.Users == null)

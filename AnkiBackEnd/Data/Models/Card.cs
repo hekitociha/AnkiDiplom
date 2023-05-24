@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace AnkiDiplom.Data.Models
+namespace AnkiBackEnd.Data.Models
 {
     public class Card
     {
@@ -10,8 +10,9 @@ namespace AnkiDiplom.Data.Models
         public string FrontSide { get; set; }
         public string BackSide { get; set; }
         public string Topic { get; set; }
-        [ForeignKey("user")]
-        public string userId { get; set; }
-        public virtual User user { get; set; }
+        public int Favorite { get; set; }
+        [ForeignKey("Deck")]
+        public string DeckId { get; set; }
+        public virtual Deck Deck { get; set; }
     }
 }

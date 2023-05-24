@@ -5,18 +5,19 @@ using AnkiDiplom.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
-namespace AnkiDiplom.Controllers
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+
+namespace AnkiBackEnd.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CardsController : ControllerBase
+    public class DecksController : ControllerBase
     {
         private readonly AppDBContent _context;
         private IUriService _uriService;
 
-        public CardsController(AppDBContent context, IUriService uriService)
+        public DecksController(AppDBContent context, IUriService uriService)
         {
             _context = context;
             _uriService = uriService;
@@ -26,18 +27,17 @@ namespace AnkiDiplom.Controllers
         [HttpGet]
         [Route("/{Deck.Topic}/cards")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult<IEnumerable<Card>>> GetCards([FromQuery] PaginationFilter filter, string topic, Deck deck)
+        public async Task<ActionResult<IEnumerable<Deck>>> GetDecks([FromQuery] PaginationFilter filter, string topic)
         {
-            var cards = FiltrationService.FiltrationCards(_context, topic);
+            var decks = FiltrationService.FiltrationDecks(_context, topic);
             var route = Request.Path.Value;
-            var cardsCount = cards.ToList();
-            cards = cards.Include(c => c.Deck)
-                .Where(c => c.Deck.Id == deck.Id)
+            var cardsCount = decks.ToList();
+            decks = decks.Include(c => c.User)
                 .Skip((filter.PageNumber - 1) * filter.PageSize)
                 .Take(filter.PageSize);
-            var cardsList = cards.ToList();
+            var cardsList = decks.ToList();
             var totalRecords = cardsCount.Count();
-            var pagedResponse = PaginationHelper<Card>.CreatePagedReponse(cardsList, filter, totalRecords, _uriService, route);
+            var pagedResponse = PaginationHelper<Deck>.CreatePagedReponse(cardsList, filter, totalRecords, _uriService, route);
             return Ok(pagedResponse);
         }
 
@@ -47,10 +47,10 @@ namespace AnkiDiplom.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult<Card>> GetCard(int id)
         {
-          if (_context.Cards == null)
-          {
-              return NotFound();
-          }
+            if (_context.Cards == null)
+            {
+                return NotFound();
+            }
             var card = await _context.Cards.FindAsync(id);
 
             if (card == null)
@@ -99,10 +99,10 @@ namespace AnkiDiplom.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult<Card>> PostCard(Card card)
         {
-          if (_context.Cards == null)
-          {
-              return Problem("Entity set 'AppDBContent.Things'  is null.");
-          }
+            if (_context.Cards == null)
+            {
+                return Problem("Entity set 'AppDBContent.Things'  is null.");
+            }
             _context.Cards.Add(card);
             await _context.SaveChangesAsync();
 

@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using AnkiDiplom.Data.Models;
+﻿using AnkiBackEnd.Data.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace AnkiDiplom.Data
 {
@@ -12,6 +12,8 @@ namespace AnkiDiplom.Data
 
         }
         public DbSet<Card> Cards { get; set; }
+        public DbSet<Deck> Decks { get; set; }
+        public DbSet<TestResult> TestResults { get; set; }
         public override DbSet<User> Users { get; set; }
     }
 }
