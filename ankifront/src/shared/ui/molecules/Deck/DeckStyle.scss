@@ -1,0 +1,31 @@
+.card{
+    background-color:  #e0efff !important;
+    position: absolute;
+    text-align: center;
+    max-width: 200px;
+    min-height: 120px;
+}
+
+.badge{
+    text-align: center;
+    height: fit-content;
+    background-color: brown;
+}
+
+.card-one {
+    margin-top: 5px;
+    margin-left: 5px;
+    z-index: 100;
+}
+
+.card-two {
+    margin-top: 10px;
+    margin-left: 10px;
+    z-index: 200;
+}
+
+.card-three {
+    margin-top: 15px;
+    margin-left: 15px;
+    z-index: 300;
+}

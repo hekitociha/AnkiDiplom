@@ -16,7 +16,6 @@ function Header() {
                 <div className="navbar left">
                     <img className="nav-img" src="../Anki-icon.svg" width="70" alt="Логотип" />
                     <a className="nav-link" href="/">Главная</a>
-                    <a className="nav-link" href="/contacts" >Контакты</a>
                 </div>
                 <div className="navbar center">
                     <FormControl>

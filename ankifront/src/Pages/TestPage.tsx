@@ -27,7 +27,7 @@ export const TestPage = () => {
               Вопрос:
             </Typography>
             <Typography variant="h5" component="div" width={"395px"}>
-              <text>{cards[0].FrontSide}</text>
+              <text>{cards[0].question}</text>
             </Typography>
             <Typography sx={{ mb: 1.5 }} color="text.secondary">
 
@@ -35,7 +35,7 @@ export const TestPage = () => {
             <Typography variant="body2">
 
             </Typography>
-            <Badge badgeContent={cards[0].Topic} color="warning" className=""></Badge>
+            <Badge badgeContent={cards[0].topic} color="warning" className=""></Badge>
           </CardContent>
           <CardActions>
           </CardActions>

@@ -23,8 +23,7 @@ namespace AnkiBackEnd.Controllers
             _result = new();
         }
 
-        [HttpGet]
-        [Route("/starttest")]
+        [HttpGet("/profile/starttest")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult<List<Card>>> StartTest(Deck deck)
         {
@@ -35,8 +34,7 @@ namespace AnkiBackEnd.Controllers
             return currentUser.Decks.FirstOrDefault(d => d.Id == deck.Id).Cards.ToList().Random(currentUser.Decks.FirstOrDefault(d => d.Id == deck.Id).Cards.Count);
         }
 
-        [HttpGet]
-        [Route("/checkanswer")]
+        [HttpGet("/profile/checkanswer")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult<bool>> CheckAnswer(Card card, string userAnswer)
         {
@@ -44,7 +42,7 @@ namespace AnkiBackEnd.Controllers
             {
                 return false;
             }
-            if (userAnswer != card.BackSide)
+            if (userAnswer != card.Answer)
             {
                 return false;
             }
@@ -52,8 +50,7 @@ namespace AnkiBackEnd.Controllers
             return true;
         }
 
-        [HttpGet]
-        [Route("/getscores")]
+        [HttpGet("/profile/getscores")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult<TestResult>> GetScores()
         {
@@ -62,6 +59,8 @@ namespace AnkiBackEnd.Controllers
                 .Include(u => u.TestResults)
                 .FirstOrDefaultAsync(o => o.Id == currentUserId);
             _result.PercentOfRightAnswer = _result.Score / _result.TotalScore * 100;
+            currentUser.TestResults.Add(_result);
+            await _context.SaveChangesAsync();
 
             return _result;
         }

@@ -33,19 +33,6 @@ export const HomePage = () => {
     delay: 1500,
   });
 
-  const handleSubmit = async () => {
-    try {
-        const response = await request.get("getint", {
-          headers: {Authorization: `Bearer ${Cookies.get("token")}`}
-
-        });
-        // Handle successful registration
-    } catch (error) {
-        console.error(error);
-        // Handle registration error
-    }
-};
-
   return (
     <>
       <Header />
@@ -56,11 +43,11 @@ export const HomePage = () => {
             Здесь вы можете создавать и изучать колоды карточек для запоминания информации
           </animated.p>
           <animated.div style={buttonAnimation} >
-            <button className="button" onClick={handleSubmit}>Создать колоду</button>
+            <button className="button">Создать колоду</button>
             <button className="button">Выбрать колоду</button>
           </animated.div>
         </div>
-        <div className="card">
+        <div className="Card">
           <ReactCardFlip isFlipped={isFlipped} flipDirection="horizontal">
             <Card sx={{ minWidth: 275 }} onClick={flipCard}>
               <CardContent>
@@ -76,7 +63,7 @@ export const HomePage = () => {
                 <Typography variant="body2">
 
                 </Typography>
-                <Badge badgeContent={"пукич"} color="warning" className=""></Badge>
+                <Badge badgeContent={"тема"} color="warning" className=""></Badge>
               </CardContent>
               <CardActions>
               </CardActions>

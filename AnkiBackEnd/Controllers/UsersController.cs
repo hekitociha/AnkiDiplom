@@ -30,12 +30,6 @@ namespace AnkiDiplom.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
-        [HttpGet("/getint"), Authorize]
-        public async Task<int> GetInt()
-        {
-            return 1;
-        }
-
         [HttpPost("/signup")]
         [AllowAnonymous]
         public async Task<IActionResult> Register(RegisterModel registerModel)
@@ -68,7 +62,6 @@ namespace AnkiDiplom.Controllers
                     Error = "",
                     Token = token
                 };
-
             }
             else
             {
@@ -125,7 +118,7 @@ namespace AnkiDiplom.Controllers
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPut("/profile/update/{id}")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
@@ -156,7 +149,7 @@ namespace AnkiDiplom.Controllers
         }
 
         // DELETE: api/Users/5
-        [HttpDelete("{id}")]
+        [HttpDelete("/profile/delete/{id}")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> DeleteUser(int id)
         {

@@ -7,12 +7,12 @@ namespace AnkiBackEnd.Data.Models
     {
         [Key]
         public int Id { get; set; }
-        public string FrontSide { get; set; }
-        public string BackSide { get; set; }
+        public string Question { get; set; }
+        public string Answer { get; set; }
         public string Topic { get; set; }
-        public int Favorite { get; set; }
+        public bool IsFavorite { get; set; }
         [ForeignKey("Deck")]
-        public string DeckId { get; set; }
+        public int DeckId { get; set; }
         public virtual Deck Deck { get; set; }
     }
 }

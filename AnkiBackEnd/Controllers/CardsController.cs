@@ -23,27 +23,23 @@ namespace AnkiDiplom.Controllers
         }
 
         // GET: api/Cards
-        [HttpGet]
-        [Route("/{Deck.Topic}/cards")]
+        [HttpGet("/profile/{Deck.Topic}/cards")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult<IEnumerable<Card>>> GetCards([FromQuery] PaginationFilter filter, string topic, Deck deck)
+        public async Task<ActionResult<IEnumerable<Card>>> GetCards([FromQuery] PaginationFilter filter, string topic, int deckId)
         {
-            var cards = FiltrationService.FiltrationCards(_context, topic);
             var route = Request.Path.Value;
-            var cardsCount = cards.ToList();
-            cards = cards.Include(c => c.Deck)
-                .Where(c => c.Deck.Id == deck.Id)
+            var totalRecords = _context.Cards.ToList().Count();
+            var cards = _context.Cards.Include(c => c.Deck)
+                .Where(c => c.Deck.Id == deckId)
                 .Skip((filter.PageNumber - 1) * filter.PageSize)
-                .Take(filter.PageSize);
-            var cardsList = cards.ToList();
-            var totalRecords = cardsCount.Count();
-            var pagedResponse = PaginationHelper<Card>.CreatePagedReponse(cardsList, filter, totalRecords, _uriService, route);
+                .Take(filter.PageSize)
+                .ToList();
+            var pagedResponse = PaginationHelper<Card>.CreatePagedReponse(cards, filter, totalRecords, _uriService, route);
             return Ok(pagedResponse);
         }
 
         // GET: api/Cards/5
-        [HttpGet]
-        [Route("/{Deck.Topic}/cards/{id}")]
+        [HttpGet("/profile/{Deck.Topic}/cards/{id}")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult<Card>> GetCard(int id)
         {
@@ -61,8 +57,7 @@ namespace AnkiDiplom.Controllers
             return card;
         }
 
-        [HttpPut]
-        [Route("/{Deck.Topic}/cards/update/{id}")]
+        [HttpPut("/profile/{Deck.Topic}/cards/update/{id}")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> PutCard(int id, Card card)
         {
@@ -94,8 +89,7 @@ namespace AnkiDiplom.Controllers
 
         // POST: api/Problems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        [Route("/{Deck.Topic}/cards/new")]
+        [HttpPost("/profile/{Deck.Topic}/cards/new")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult<Card>> PostCard(Card card)
         {
@@ -110,8 +104,7 @@ namespace AnkiDiplom.Controllers
         }
 
         // DELETE: api/Problems/5
-        [HttpDelete]
-        [Route("/{Deck.Topic}/cards/delete{id}")]
+        [HttpDelete("/profile/{Deck.Topic}/cards/delete{id}")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> DeleteCard(int id)
         {

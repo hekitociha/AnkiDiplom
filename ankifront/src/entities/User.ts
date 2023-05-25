@@ -1,8 +1,8 @@
-import { AnkiCard } from "./AnkiCard";
+import { Deck } from "./Deck";
 
 export interface User {
     id: string;
     email: string;
     avatarSrc: string;
-    cards: AnkiCard[];
+    decks: Deck[];
   }

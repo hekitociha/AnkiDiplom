@@ -1,4 +1,5 @@
 using AnkiBackEnd.Data.Models;
+using AnkiBackEnd.Interfaces;
 using AnkiBackEnd.Services;
 using AnkiDiplom.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -17,7 +18,13 @@ string connection = builder.Configuration.GetConnectionString("DefaultConnection
 builder.Services.AddDbContext<AppDBContent>(options => options.UseSqlServer(connection));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
+builder.Services.AddSingleton<IUriService>(p =>
+{
+    var accessor = p.GetRequiredService<IHttpContextAccessor>();
+    var request = accessor.HttpContext.Request;
+    var uri = string.Concat(request.Scheme, "://", request.Host.ToUriComponent());
+    return new UriService(uri);
+});
 builder.Services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
@@ -52,9 +59,9 @@ builder.Services
         options.TokenValidationParameters = new TokenValidationParameters()
         {
             ClockSkew = TimeSpan.Zero,
-            //ValidateIssuer = true,
-            //ValidateAudience = true,
-            //ValidateLifetime = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             ValidIssuer = "AnkiWebApi",
             ValidAudience = "AnkiClient",

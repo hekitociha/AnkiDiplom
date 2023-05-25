@@ -5,6 +5,7 @@ using AnkiDiplom.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,62 +17,65 @@ namespace AnkiBackEnd.Controllers
     {
         private readonly AppDBContent _context;
         private IUriService _uriService;
+        readonly IHttpContextAccessor _httpContextAccessor;
 
-        public DecksController(AppDBContent context, IUriService uriService)
+        public DecksController(AppDBContent context, IUriService uriService, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _uriService = uriService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // GET: api/Cards
-        [HttpGet]
-        [Route("/{Deck.Topic}/cards")]
+        [HttpGet("/profile/decks")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult<IEnumerable<Deck>>> GetDecks([FromQuery] PaginationFilter filter, string topic)
         {
+            var currentUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var decks = FiltrationService.FiltrationDecks(_context, topic);
             var route = Request.Path.Value;
-            var cardsCount = decks.ToList();
-            decks = decks.Include(c => c.User)
+            var totalRecords = decks.ToList().Count();
+            var decksList = decks.Include(c => c.User)
+                .Where(c => c.User.Id == currentUserId)
                 .Skip((filter.PageNumber - 1) * filter.PageSize)
-                .Take(filter.PageSize);
-            var cardsList = decks.ToList();
-            var totalRecords = cardsCount.Count();
-            var pagedResponse = PaginationHelper<Deck>.CreatePagedReponse(cardsList, filter, totalRecords, _uriService, route);
+                .Take(filter.PageSize).ToList();
+            var pagedResponse = PaginationHelper<Deck>.CreatePagedReponse(decksList, filter, totalRecords, _uriService, route);
             return Ok(pagedResponse);
         }
 
         // GET: api/Cards/5
-        [HttpGet]
-        [Route("/{Deck.Topic}/cards/{id}")]
+
+        //Под вопросом надо или нет
+
+        //[HttpGet]
+        //[Route("/{Deck.Topic}/cards/{id}")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
+        //public async Task<ActionResult<Card>> GetCard(int id)
+        //{
+        //    if (_context.Cards == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    var card = await _context.Cards.FindAsync(id);
+
+        //    if (card == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return card;
+        //}
+
+        [HttpPut("/profile/decks/update/{id}")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult<Card>> GetCard(int id)
+        public async Task<IActionResult> PutDeck(int id, Deck deck)
         {
-            if (_context.Cards == null)
-            {
-                return NotFound();
-            }
-            var card = await _context.Cards.FindAsync(id);
-
-            if (card == null)
-            {
-                return NotFound();
-            }
-
-            return card;
-        }
-
-        [HttpPut]
-        [Route("/{Deck.Topic}/cards/update/{id}")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<IActionResult> PutCard(int id, Card card)
-        {
-            if (id != card.Id)
+            if (id != deck.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(card).State = EntityState.Modified;
+            _context.Entry(deck).State = EntityState.Modified;
 
             try
             {
@@ -79,7 +83,7 @@ namespace AnkiBackEnd.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CardExists(id))
+                if (!DeckExists(id))
                 {
                     return NotFound();
                 }
@@ -94,44 +98,82 @@ namespace AnkiBackEnd.Controllers
 
         // POST: api/Problems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        [Route("/{Deck.Topic}/cards/new")]
+        [HttpPost("/profile/decks/new")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult<Card>> PostCard(Card card)
+        public async Task<ActionResult<Card>> PostDeck(Deck deck)
         {
-            if (_context.Cards == null)
+            if (_context.Decks == null)
             {
                 return Problem("Entity set 'AppDBContent.Things'  is null.");
             }
-            _context.Cards.Add(card);
+            _context.Decks.Add(deck);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProblem", new { id = card.Id }, card);
+            return CreatedAtAction("GetProblem", new { id = deck.Id }, deck);
         }
 
         // DELETE: api/Problems/5
-        [HttpDelete]
-        [Route("/{Deck.Topic}/cards/delete{id}")]
+        [HttpDelete("/profile/decks/delete/{id}")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<IActionResult> DeleteCard(int id)
+        public async Task<IActionResult> DeleteDeck(int id)
         {
-            if (_context.Cards == null)
+            if (_context.Decks == null)
             {
                 return NotFound();
             }
-            var card = await _context.Cards.FindAsync(id);
-            if (card == null)
+            var deck = await _context.Decks.FindAsync(id);
+            if (deck == null)
             {
                 return NotFound();
             }
 
-            _context.Cards.Remove(card);
+            _context.Decks.Remove(deck);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool CardExists(int id)
+        [HttpGet("/profile/decks/shareforall/{id}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> ShareDeck(int id)
+        {
+            if (_context.Decks == null)
+            {
+                return NotFound();
+            }
+            var deck = await _context.Decks.FindAsync(id);
+            if (deck == null)
+            {
+                return NotFound();
+            }
+
+            deck.IsSharedForAll = true;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [HttpGet("/profile/decks/sharefromlink/{id}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> ShareFromLinkDeck(int id)
+        {
+            if (_context.Decks == null)
+            {
+                return NotFound();
+            }
+            var deck = await _context.Decks.FindAsync(id);
+            if (deck == null)
+            {
+                return NotFound();
+            }
+
+            deck.IsSharedFromLink = true;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool DeckExists(int id)
         {
             return (_context.Cards?.Any(e => e.Id == id)).GetValueOrDefault();
         }

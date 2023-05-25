@@ -16,6 +16,5 @@
             }
             return list.OrderBy(arg => Guid.NewGuid()).Take(elementsCount).ToList();
         }
-
     }
 }

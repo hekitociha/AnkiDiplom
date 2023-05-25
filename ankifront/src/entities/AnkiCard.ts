@@ -1,10 +1,11 @@
-import { User } from "./User";
+import { Deck } from "./Deck";
 
 export interface AnkiCard {
-  Id: number;
-  FrontSide: string;
-  BackSide: string;
-  Topic: string;
-  userId: string;
-  user: User|undefined
+  id: number;
+  question: string;
+  answer: string;
+  topic: string;
+  isFavorite : boolean;
+  deckId: number;
+  deck: Deck|undefined
 }

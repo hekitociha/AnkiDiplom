@@ -1,16 +1,18 @@
 import ReactCardFlip from 'react-card-flip';
-import { Card, CardContent, Typography, Button, CardActions, Box, Badge } from "@mui/material";
+import { Card, CardContent, Typography, Button, CardActions, Box, Badge, Grid } from "@mui/material";
 import { useEffect, useState } from 'react';
 import { User } from '../entities/User';
 import { AnkiCard } from '../entities/AnkiCard';
 import { request } from "../Services/request";
-import { render } from '@testing-library/react';
+import { Deck } from '../entities/Deck';
+import { DeckComponent } from '../shared/ui/molecules/Deck/Deck';
+import Header from '../Components/Header';
 
 const ProfilePage = () => {
 
   const [newCardFrontSide, setNewCardFrontSide] = useState('');
   const [newCardBackSide, setNewCardBackSide] = useState('');
-  const [newCardTopic, setNewCardTopic] = useState('');
+  const [newDeckTopic, setNewDeckTopic] = useState('');
 
   const [isFlipped, setIsFlipped] = useState<boolean>(false)
 
@@ -34,105 +36,63 @@ const ProfilePage = () => {
     setNewCardBackSide(event.target.value);
   };
 
-  const handleNewCardTopicChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setNewCardTopic(event.target.value);
+  const handleNewDeckTopicChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewDeckTopic(event.target.value);
   };
 
-  const handleNewPostSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleNewDeckSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const newCard: AnkiCard = {
-      Id: user!.cards.length + 1,
-      FrontSide: newCardFrontSide,
-      BackSide: newCardBackSide,
-      Topic: newCardTopic,
+    const newDeck: Deck = {
+      id: user!.decks.length + 1,
+      isPrivate: false,
+      isSharedForAll: false,
+      isSharedFromLink: false,
+      topic: newDeckTopic,
+      cards: new Array<AnkiCard>(),
+      user: user,
       userId: user!.id,
-      user: user
     };
 
-    user!.cards.push(newCard);
-    request.post("/add", newCard);
+    user!.decks.push(newDeck);
+    request.post("/profile/decks/new", newDeck);
 
     setNewCardFrontSide('');
     setNewCardBackSide('');
-    setNewCardTopic('');
+    setNewDeckTopic('');
   };
-  if (!user) return <div/>
+  if (!user) return <div />
   else
-  return (
-    <div>
-      <div>
-        <img src={user.avatarSrc} alt="Avatar" />
-        <h2>{user.email}</h2>
-      </div>
-
-      <div>
-        <h3>My Posts</h3>
-        <ul>
-          {user.cards.map((card) => (
-            <li key={card.Id}>
-              <ReactCardFlip isFlipped={isFlipped} flipDirection="horizontal">
-                <Card sx={{ minWidth: 275 }} onClick={flipCard}>
-                  <CardContent>
-                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                      Вопрос:
-                    </Typography>
-                    <Typography variant="h5" component="div" width={"395px"}>
-                      <text>{card.FrontSide}</text>
-                    </Typography>
-                    <Typography sx={{ mb: 1.5 }} color="text.secondary">
-
-                    </Typography>
-                    <Typography variant="body2">
-
-                    </Typography>
-                    <Badge badgeContent={card.Topic} color="warning" className=""></Badge>
-                  </CardContent>
-                  <CardActions>
-                  </CardActions>
-                </Card>
-                <Card sx={{ minWidth: 275 }} onClick={flipCard}>
-                  <CardContent>
-                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                      Ответ:
-                    </Typography>
-                    <Typography variant="h5" component="div" width={"395px"}>
-                      <text>{card.BackSide}</text>
-                    </Typography>
-                    <Typography sx={{ mb: 1.5 }} color="text.secondary">
-
-                    </Typography>
-                    <Typography variant="body2">
-
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                  </CardActions>
-                </Card>
-              </ReactCardFlip>
-            </li>
-          ))}
-        </ul>
-
-        <h3>Новая карточка</h3>
-        <form onSubmit={handleNewPostSubmit}>
+    return (
+      <><Header />
+        <div>
           <div>
-            <label htmlFor="newCardFrontSide">Вопрос:</label>
-            <textarea id="newCardFrontSide" name="newCardFrontSide" value={newCardFrontSide} onChange={handleNewCardFrontSideChange} />
+            <img src={user.avatarSrc} alt="Avatar" />
+            <h2>{user.email}</h2>
           </div>
+
           <div>
-            <label htmlFor="newCardBackSide">Ответ:</label>
-            <textarea id="newCardBackSide" name="newCardBackSide" value={newCardBackSide} onChange={handleNewCardBackSideChange} />
+            <h3>Мои колоды</h3>
+            <Grid container spacing={2}>
+              {user.decks.map((deck) => (
+                <Grid item xs={4} key={deck.id}>
+                  <DeckComponent topic={deck.topic} />
+                </Grid>
+              ))}
+            </Grid>
+
+            <h3>Новая колода</h3>
+            <form onSubmit={handleNewDeckSubmit}>
+              <div>
+                <label htmlFor="newDeckTopic">Тема:</label>
+                <input type='text' id="newDeckTopic" name="newDeckTopic" value={newDeckTopic} onChange={handleNewDeckTopicChange} />
+              </div>
+              <button type="submit">Создать</button>
+            </form>
           </div>
-          <div>
-            <label htmlFor="newCardTopic">Тема:</label>
-            <input type='text' id="newCardTopic" name="newCardTopic" value={newCardTopic} onChange={handleNewCardTopicChange} />
-          </div>
-          <button type="submit">Создать</button>
-        </form>
-      </div>
-    </div>
-  )
+        </div>
+      </>
+    )
 };
 
 export default ProfilePage;
