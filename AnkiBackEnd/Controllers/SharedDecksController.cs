@@ -26,39 +26,34 @@ namespace AnkiBackEnd.Controllers
 
         // GET: api/Cards
         [HttpGet("/sharedDecks")]
-        public async Task<ActionResult<IEnumerable<Deck>>> GetSharedDecks([FromQuery] PaginationFilter filter, string topic)
+        public async Task<ActionResult<IEnumerable<Deck>>> GetSharedDecks()
         {
-            var decks = FiltrationService.FiltrationDecks(_context, topic);
-            var route = Request.Path.Value;
-            var totalRecords = decks.ToList().Count();
-            var decksList = decks.Include(c => c.User)
-                .Where(d => d.IsSharedForAll)
-                .Skip((filter.PageNumber - 1) * filter.PageSize)
-                .Take(filter.PageSize).ToList();
-            var pagedResponse = PaginationHelper<Deck>.CreatePagedReponse(decksList, filter, totalRecords, _uriService, route);
-            return Ok(pagedResponse);
+            var decksList = _context.Decks.Include(d => d.User).Where(d=>d.IsSharedForAll);
+            return Ok(decksList);
         }
 
         [HttpGet("/sharedDecks/{id}")]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult<Deck>> GetSharedFromLinkDeck(int deckId)
+        public async Task<ActionResult<Deck>> GetSharedFromLinkDeck(int id)
         {
-            var deck = _context.Decks.Include(c => c.User)
-                .First(d => d.Id == deckId);
+            var deck = await _context.Decks.Include(d => d.Cards)
+                .FirstOrDefaultAsync(d => d.Id == id && d.IsSharedForAll);
             return Ok(deck);
         }
 
         [HttpGet("/sharedDecks/add/{id}")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult<Deck>> AddSharedFromLinkDeck(int deckId)
+        public async Task<ActionResult<Deck>> AddSharedFromLinkDeck(int id)
         {
+            //var Id = int.Parse(id);
             var currentUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var deck = _context.Decks.First(d => d.Id == deckId);
+            var deck = _context.Decks.First(d => d.Id == id);
             var currentUser = await _context.Users.FirstOrDefaultAsync(o => o.Id == currentUserId);
+            _context.Entry(currentUser).State = EntityState.Modified;
             if (currentUser != null && !currentUser.Decks.Contains(deck))
             {
                 currentUser.Decks.Add(deck);
             }
+            await _context.SaveChangesAsync();
             return Ok();
         }
     }

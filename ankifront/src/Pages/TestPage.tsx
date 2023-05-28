@@ -4,6 +4,7 @@ import Header from "../Components/Header"
 import { GetTestCard } from "../Services/TestCardRequest"
 import { request } from "../Services/request"
 import { AnkiCard } from "../entities/AnkiCard"
+import Cookie from "js-cookie";
 
 export const TestPage = () => {
 
@@ -17,9 +18,16 @@ export const TestPage = () => {
     })
   }, [] )
 
+  const [isAuthorized, setIsAuthorized] = useState<boolean>(false)
+
+  useEffect(() => {
+    const token = Cookie.get("token");
+    setIsAuthorized(!!token);
+  }, []);
+
   return (
     <div>
-      <Header />
+      <Header/>
       <Card>
         <Card sx={{ minWidth: 275 }}>
           <CardContent>

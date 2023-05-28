@@ -1,11 +1,11 @@
 import { Card, CardContent, Typography, Button, CardActions, Box, Badge } from "@mui/material";
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import ReactCardFlip from 'react-card-flip';
 import { useSpring, animated } from 'react-spring';
 import Header from "../Components/Header";
 import './StyleForHomePage.scss'
 import { request } from "../Services/request";
-import Cookies from "js-cookie";
+import Cookie from "js-cookie";
 
 export const HomePage = () => {
 
@@ -35,16 +35,16 @@ export const HomePage = () => {
 
   return (
     <>
-      <Header />
+      <Header/>
       <div className="container">
         <div className="maintext">
-          <animated.h1 style={titleAnimation} className="Text">Anki - тренажер для запоминания</animated.h1>
-          <animated.p style={subtitleAnimation} className="Text">
+          <animated.h1 style={titleAnimation} className="HomePageText">Anki - тренажер для запоминания</animated.h1>
+          <animated.p style={subtitleAnimation} className="HomePageText">
             Здесь вы можете создавать и изучать колоды карточек для запоминания информации
           </animated.p>
           <animated.div style={buttonAnimation} >
             <button className="button">Создать колоду</button>
-            <button className="button">Выбрать колоду</button>
+            <a className="button" href="/sharedDecks">Выбрать колоду</a>
           </animated.div>
         </div>
         <div className="Card">
@@ -83,6 +83,7 @@ export const HomePage = () => {
 
                 </Typography>
               </CardContent>
+              <Badge badgeContent={"тема"} color="warning" className=""></Badge>
               <CardActions>
               </CardActions>
             </Card>

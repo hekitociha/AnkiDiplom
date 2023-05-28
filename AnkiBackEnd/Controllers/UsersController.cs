@@ -32,18 +32,26 @@ namespace AnkiDiplom.Controllers
 
         [HttpPost("/signup")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register(RegisterModel registerModel)
+        public async Task<ActionResult<RegisterDTO>> Register(RegisterModel registerModel)
         {
-            var user = new User { UserName = registerModel.Email, Email = registerModel.Email};
+            var user = new User { UserName = registerModel.Email, Email = registerModel.Email };
             var result = await _userManager.CreateAsync(user, registerModel.Password);
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                return Ok();
+                return new RegisterDTO
+                {
+                    IsRegister = true,
+                    Error = ""
+                };
             }
             else
             {
-                return BadRequest(result.Errors);
+                return new RegisterDTO
+                {
+                    IsRegister = false,
+                    Error = "Ошибка регистрации"
+                };
             }
         }
         [HttpPost("/signin")]
@@ -56,8 +64,8 @@ namespace AnkiDiplom.Controllers
 
                 var token = _tokenService.CreateToken(user);
 
-                return new LoginDTO 
-                { 
+                return new LoginDTO
+                {
                     IsAuthorized = true,
                     Error = "",
                     Token = token
@@ -72,6 +80,23 @@ namespace AnkiDiplom.Controllers
                     Token = ""
                 };
             }
+        }
+
+        [HttpPost("/profile/changeAvatar")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<string> ChangeAvatar(IFormFile avatar)
+        {
+            var currentUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentUser = await _context.Users.FirstOrDefaultAsync(o => o.Id == currentUserId);
+
+            _context.Entry(currentUser).State = EntityState.Modified;
+
+            currentUser.Avatar = avatar;
+            currentUser.AvatarSrc = currentUser.GetSrcPhoto();
+
+            await _context.SaveChangesAsync();
+
+            return currentUser.AvatarSrc;
         }
 
         [HttpGet("/signout")]

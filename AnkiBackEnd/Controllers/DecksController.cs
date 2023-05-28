@@ -1,10 +1,12 @@
-﻿using AnkiBackEnd.Data.Models;
+﻿using AnkiBackEnd.Data.DTOs;
+using AnkiBackEnd.Data.Models;
 using AnkiBackEnd.Interfaces;
 using AnkiBackEnd.Services;
 using AnkiDiplom.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System.Security.Claims;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -47,24 +49,24 @@ namespace AnkiBackEnd.Controllers
 
         //Под вопросом надо или нет
 
-        //[HttpGet]
-        //[Route("/{Deck.Topic}/cards/{id}")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
-        //public async Task<ActionResult<Card>> GetCard(int id)
-        //{
-        //    if (_context.Cards == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    var card = await _context.Cards.FindAsync(id);
+        [HttpGet]
+        [Route("/profile/decks/{id}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<ActionResult<Deck>> GetDeck(int id)
+        {
+            if (_context.Decks == null)
+            {
+                return NotFound();
+            }
+            var deck = await _context.Decks.Include(d => d.Cards).FirstOrDefaultAsync(d=>d.Id ==id);
 
-        //    if (card == null)
-        //    {
-        //        return NotFound();
-        //    }
+            if (deck == null)
+            {
+                return NotFound();
+            }
 
-        //    return card;
-        //}
+            return deck;
+        }
 
         [HttpPut("/profile/decks/update/{id}")]
         [Authorize(AuthenticationSchemes = "Bearer")]
@@ -100,13 +102,27 @@ namespace AnkiBackEnd.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("/profile/decks/new")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult<Card>> PostDeck(Deck deck)
+        public async Task<ActionResult<Card>> PostDeck([FromBody]DeckDTO deckDTO)
         {
+            var deck = new Deck()
+            {
+                Cards = deckDTO.Cards,
+                IsPrivate = false,
+                IsSharedForAll = false,
+                IsSharedFromLink = false,
+                Topic = deckDTO.Topic
+            };
+            var currentUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentUser = await _context.Users.FirstOrDefaultAsync(o => o.Id == currentUserId);
+
+            _context.Entry(currentUser).State = EntityState.Modified;
+
+            currentUser.Decks.Add(deck);
+
             if (_context.Decks == null)
             {
                 return Problem("Entity set 'AppDBContent.Things'  is null.");
             }
-            _context.Decks.Add(deck);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetProblem", new { id = deck.Id }, deck);
@@ -146,7 +162,7 @@ namespace AnkiBackEnd.Controllers
             {
                 return NotFound();
             }
-
+            _context.Entry(deck).State = EntityState.Modified;
             deck.IsSharedForAll = true;
             await _context.SaveChangesAsync();
 

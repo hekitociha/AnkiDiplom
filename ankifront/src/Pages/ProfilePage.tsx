@@ -1,5 +1,3 @@
-import ReactCardFlip from 'react-card-flip';
-import { Card, CardContent, Typography, Button, CardActions, Box, Badge, Grid } from "@mui/material";
 import { useEffect, useState } from 'react';
 import { User } from '../entities/User';
 import { AnkiCard } from '../entities/AnkiCard';
@@ -7,34 +5,40 @@ import { request } from "../Services/request";
 import { Deck } from '../entities/Deck';
 import { DeckComponent } from '../shared/ui/molecules/Deck/Deck';
 import Header from '../Components/Header';
+import './ProfilePageStyle.scss';
+import CircularJSON from 'circular-json';
+import { DeckDTO } from '../entities/DeckDTO';
 
 const ProfilePage = () => {
 
-  const [newCardFrontSide, setNewCardFrontSide] = useState('');
-  const [newCardBackSide, setNewCardBackSide] = useState('');
   const [newDeckTopic, setNewDeckTopic] = useState('');
-
-  const [isFlipped, setIsFlipped] = useState<boolean>(false)
-
-  const flipCard = () => {
-    setIsFlipped(prevState => !prevState)
-  }
 
   const [user, setUser] = useState<User>()
 
+  const [avatar, setAvatar] = useState<string | undefined>(user?.avatarSrc)
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (file) {
+      const formData = new FormData()
+      formData.append('avatar', file)
+      request.post<string>('/profile/changeAvatar', formData, {
+        headers: {
+          'Content-type': 'multipart/form-data'
+        }
+      }
+      ).then(response => setAvatar(response.data))
+    }
+  };
+
+
   useEffect(() => {
-    request.get("/profile").then(data => {
+    request.get<User>("/profile").then(data => {
       setUser(data.data)
+      setAvatar(data.data.avatarSrc)
     })
   }, [])
-
-  const handleNewCardFrontSideChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setNewCardFrontSide(event.target.value);
-  };
-
-  const handleNewCardBackSideChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setNewCardBackSide(event.target.value);
-  };
 
   const handleNewDeckTopicChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewDeckTopic(event.target.value);
@@ -42,8 +46,8 @@ const ProfilePage = () => {
 
   const handleNewDeckSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    const newDeck: Deck = {
+    
+    const newDeck:Deck ={
       id: user!.decks.length + 1,
       isPrivate: false,
       isSharedForAll: false,
@@ -52,47 +56,62 @@ const ProfilePage = () => {
       cards: new Array<AnkiCard>(),
       user: user,
       userId: user!.id,
-    };
+    }
 
-    user!.decks.push(newDeck);
-    request.post("/profile/decks/new", newDeck);
+    const newDeckDTO:DeckDTO ={
+      isPrivate: false,
+      isSharedForAll: false,
+      isSharedFromLink: false,
+      topic: newDeckTopic,
+      cards: new Array<AnkiCard>(),
+    }
 
-    setNewCardFrontSide('');
-    setNewCardBackSide('');
-    setNewDeckTopic('');
-  };
+
+    const jsonString = CircularJSON.stringify(newDeckDTO);
+    user!.decks?.push(newDeck);
+    request.post("/profile/decks/new", jsonString);
+    window.location.reload()
+  }
+
   if (!user) return <div />
   else
     return (
-      <><Header />
-        <div>
-          <div>
-            <img src={user.avatarSrc} alt="Avatar" />
-            <h2>{user.email}</h2>
+      <>
+        <Header />
+        <div className='profile_page'>
+          <div className='avatar_login'>
+
+
+            <img src={"https://localhost:5001/" + avatar} alt="Avatar" className='profile_avatar'/>
+            <div>
+              <input type="file" onChange={handleFileChange} />
+            </div>
+
+
+            <h2 className="Text">{user.email}</h2>
           </div>
 
-          <div>
-            <h3>Мои колоды</h3>
-            <Grid container spacing={2}>
-              {user.decks.map((deck) => (
-                <Grid item xs={4} key={deck.id}>
-                  <DeckComponent topic={deck.topic} />
-                </Grid>
-              ))}
-            </Grid>
+          <div className='profile_content'>
+            <h3 className="Text">Мои колоды</h3>
 
-            <h3>Новая колода</h3>
-            <form onSubmit={handleNewDeckSubmit}>
-              <div>
-                <label htmlFor="newDeckTopic">Тема:</label>
-                <input type='text' id="newDeckTopic" name="newDeckTopic" value={newDeckTopic} onChange={handleNewDeckTopicChange} />
-              </div>
-              <button type="submit">Создать</button>
+            <h3 className="Text">Новая колода</h3>
+            <form onSubmit={handleNewDeckSubmit} className='form'>
+              <label htmlFor="newDeckTopic" className="Text">Тема:</label>
+              <input type='text' id="newDeckTopic" name="newDeckTopic" className='row' value={newDeckTopic} onChange={handleNewDeckTopicChange} />
+              <button type="submit" className='button'>Создать</button>
             </form>
+
+            <div className='DeckList'>
+              {user.decks.map((deck) => (
+                <DeckComponent topic={deck.topic} id ={deck.id}/>
+              ))}
+            </div>
+
           </div>
         </div>
       </>
     )
+
 };
 
 export default ProfilePage;

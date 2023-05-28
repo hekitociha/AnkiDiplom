@@ -61,7 +61,7 @@ const SignIn: React.FC = () => {
         }
     };
 
-    if (authorized) return <Navigate to="/profile"/>
+    if (authorized) return <Navigate to="/"/>
     else
     return (
         <div className="signForm">

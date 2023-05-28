@@ -1,20 +1,18 @@
 import { Input, FormControl, Button } from '@mui/material';
 import './Style.scss'
-import Avatar from '@mui/material/Avatar';
-import { deepPurple } from '@mui/material/colors';
-import { useState } from "react"
-import { NavLink, Route } from 'react-router-dom';
 import { request } from '../Services/request';
+import Cookie from "js-cookie";
+import { ProfileAvatar } from '../shared/ui/atoms/Avatar/Avatar';
 
-function Header() {
+export const Header = () => {
 
-    const [isLogin, setIsLogin] = useState(true)
+    const token = Cookie.get("token");
 
     return (
         <>
             <div className="navbar">
                 <div className="navbar left">
-                    <img className="nav-img" src="../Anki-icon.svg" width="70" alt="Логотип" />
+                    <img className="nav-img" src="http://localhost:3000/Anki-icon.svg" width="70" alt="Логотип" />
                     <a className="nav-link" href="/">Главная</a>
                 </div>
                 <div className="navbar center">
@@ -23,14 +21,13 @@ function Header() {
                     </FormControl>
                 </div>
                 <div className="navbar right">
-                    {isLogin ? (
+                    {!!token ? (
                         <>
                             <a className='avatar' href = '/profile' >
-                                <Avatar sx={{ bgcolor: deepPurple[500] }}>
-                                    <text>H</text>                                    
-                                </Avatar>
+                                <ProfileAvatar />
                             </a>
-                            <button className='button' onClick={() => request.get("/signout")}>Выйти</button>
+                            <button className='button' onClick={() => {request.get("/signout")}
+                        }>Выйти</button>
                         </>
                     ) : (
                         <>

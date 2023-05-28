@@ -1,4 +1,5 @@
-﻿using AnkiBackEnd.Data.Models;
+﻿using AnkiBackEnd.Data.DTOs;
+using AnkiBackEnd.Data.Models;
 using AnkiBackEnd.Interfaces;
 using AnkiBackEnd.Services;
 using AnkiDiplom.Data;
@@ -23,19 +24,22 @@ namespace AnkiDiplom.Controllers
         }
 
         // GET: api/Cards
-        [HttpGet("/profile/{Deck.Topic}/cards")]
+        [HttpGet("/profile/{id}/cards")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult<IEnumerable<Card>>> GetCards([FromQuery] PaginationFilter filter, string topic, int deckId)
+        public async Task<ActionResult<IEnumerable<Card>>> GetCards(int id)
         {
-            var route = Request.Path.Value;
-            var totalRecords = _context.Cards.ToList().Count();
             var cards = _context.Cards.Include(c => c.Deck)
-                .Where(c => c.Deck.Id == deckId)
-                .Skip((filter.PageNumber - 1) * filter.PageSize)
-                .Take(filter.PageSize)
-                .ToList();
-            var pagedResponse = PaginationHelper<Card>.CreatePagedReponse(cards, filter, totalRecords, _uriService, route);
-            return Ok(pagedResponse);
+                .Where(c => c.Deck.Id == id);
+            return Ok(cards);
+        }
+
+        [HttpGet("/sharedDeck/{id}/cards")]
+        public async Task<ActionResult<IEnumerable<Card>>> GetSharedDeckCards(int id)
+        {
+            var cards = _context.Cards.Include(c => c.Deck)
+                .Where(c => c.Deck.Id == id);
+            var cardsList = cards.ToList();
+            return Ok(cards);
         }
 
         // GET: api/Cards/5
@@ -89,22 +93,28 @@ namespace AnkiDiplom.Controllers
 
         // POST: api/Problems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("/profile/{Deck.Topic}/cards/new")]
+        [HttpPost("/profile/{idDeck}/cards/new")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult<Card>> PostCard(Card card)
+        public async Task<ActionResult<Card>> PostCard(int idDeck, CardDTO cardDTO)
         {
-          if (_context.Cards == null)
-          {
-              return Problem("Entity set 'AppDBContent.Things'  is null.");
-          }
-            _context.Cards.Add(card);
+            var card = new Card()
+            {
+                Question = cardDTO.Question,
+                Answer = cardDTO.Answer,
+                Topic = cardDTO.Topic,
+                IsFavorite = cardDTO.IsFavorite,
+            };
+
+            var deck = await _context.Decks.FirstOrDefaultAsync(d=>d.Id == idDeck);
+            _context.Entry(deck).State = EntityState.Modified;
+            deck.Cards.Add(card);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetProblem", new { id = card.Id }, card);
         }
 
         // DELETE: api/Problems/5
-        [HttpDelete("/profile/{Deck.Topic}/cards/delete{id}")]
+        [HttpDelete("/profile/cards/delete/{id}")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> DeleteCard(int id)
         {

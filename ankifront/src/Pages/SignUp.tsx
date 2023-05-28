@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import './StyleForSignInSignUp.scss'
 import { request } from "../Services/request";
+import { Navigate } from "react-router-dom";
 
 interface IFormData {
     Email: string;
@@ -26,19 +27,23 @@ const SignUp: React.FC = () => {
             };
         });
     };
+    const [register, setRegister] = useState<boolean>(false)
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
             const response = await request.post("signup", formData);
             console.log(response.data);
-            // Handle successful registration
+            if (response.data.isRegister === true) {
+                setRegister(response.data.isRegister)               
+            }
         } catch (error) {
             console.error(error);
             // Handle registration error
         }
     };
-
+    if (register) return <Navigate to="/signin"/>
+    else
     return (
         <div className="signForm">
             <div className="logo">

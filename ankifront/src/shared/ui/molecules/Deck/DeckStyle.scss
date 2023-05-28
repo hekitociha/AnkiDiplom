@@ -29,3 +29,15 @@
     margin-left: 15px;
     z-index: 300;
 }
+.card_content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.add_buttons{
+    text-align: right;
+    margin-top: 50px;
+}
+.card_button{
+    margin-left: 5px;
+}

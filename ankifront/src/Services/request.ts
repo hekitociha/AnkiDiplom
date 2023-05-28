@@ -5,7 +5,9 @@ export const request = axios.create({
   baseURL: "https://localhost:5001/",
   timeout: 6000,
   withCredentials: true,
-  headers: {'Authorization': `Bearer ${Cookie.get("token")}`}
+  headers: {'Authorization': `Bearer ${Cookie.get("token")}`,
+            'Content-Type' : `application/json`},
+  data: toString
 
 });
 
